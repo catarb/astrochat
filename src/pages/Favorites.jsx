@@ -3,10 +3,9 @@ import { AstroChatContext } from "../context/AstroChatContext";
 import { NavLink } from "react-router-dom";
 
 function Favorites() {
-  const { objects } = useContext(AstroChatContext);
+  const { objects, favorites } = useContext(AstroChatContext);
 
-  const favoriteIds = ["sn1987a", "cassiopeiaA"];
-  const favoriteObjects = objects.filter((obj) => favoriteIds.includes(obj.id));
+  const favoriteObjects = objects.filter((obj) => favorites.includes(obj.id));
 
   return (
     <div
@@ -22,45 +21,53 @@ function Favorites() {
         Tus objetos astronómicos destacados.
       </p>
 
-      <div style={{ display: "grid", gap: "16px", maxWidth: "700px" }}>
-        {favoriteObjects.map((obj) => (
-          <NavLink
-            key={obj.id}
-            to={`/chat/${obj.id}`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <div
-              style={{
-                backgroundColor: "#1b2730",
-                border: "1px solid #2a3942",
-                borderRadius: "18px",
-                padding: "16px",
-                display: "flex",
-                alignItems: "center",
-                gap: "14px",
-              }}
+      {favoriteObjects.length === 0 ? (
+        <p style={{ color: "#94a3b8" }}>Todavía no marcaste favoritos.</p>
+      ) : (
+        <div style={{ display: "grid", gap: "16px", maxWidth: "700px" }}>
+          {favoriteObjects.map((obj) => (
+            <NavLink
+              key={obj.id}
+              to={`/chat/${obj.id}`}
+              style={{ textDecoration: "none", color: "inherit" }}
             >
-              <img
-                src={obj.image}
-                alt={obj.name}
+              <div
                 style={{
-                  width: "58px",
-                  height: "58px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: "2px solid #3b82f6",
+                  backgroundColor: "#1b2730",
+                  border: "1px solid #2a3942",
+                  borderRadius: "18px",
+                  padding: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
                 }}
-              />
-              <div>
-                <h3 style={{ margin: 0, color: "#f8fafc" }}>{obj.name}</h3>
-                <p style={{ margin: "4px 0 0 0", color: "#94a3b8" }}>
-                  {obj.type} — {obj.galaxy}
-                </p>
+              >
+                <img
+                  src={obj.image}
+                  alt={obj.name}
+                  style={{
+                    width: "58px",
+                    height: "58px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "2px solid #3b82f6",
+                  }}
+                  onError={(e) => {
+                    e.target.src =
+                      "https://via.placeholder.com/150/1e293b/ffffff?text=Astro";
+                  }}
+                />
+                <div>
+                  <h3 style={{ margin: 0, color: "#f8fafc" }}>{obj.name}</h3>
+                  <p style={{ margin: "4px 0 0 0", color: "#94a3b8" }}>
+                    {obj.type} — {obj.galaxy}
+                  </p>
+                </div>
               </div>
-            </div>
-          </NavLink>
-        ))}
-      </div>
+            </NavLink>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

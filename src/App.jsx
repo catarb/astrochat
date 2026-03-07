@@ -5,8 +5,19 @@ import Chat from "./pages/Chat";
 import Favorites from "./pages/Favorites";
 import Objects from "./pages/Objects";
 import Settings from "./pages/Settings";
+import Login from "./pages/Login";
 
 function App() {
+  const user = localStorage.getItem("astrochat_user");
+
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="*" element={<Login />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

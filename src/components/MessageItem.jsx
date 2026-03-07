@@ -4,7 +4,11 @@ function MessageItem({ message }) {
   return (
     <div className={`message-row ${isUser ? "user" : "bot"}`}>
       <div className={`message-bubble ${isUser ? "user" : "bot"}`}>
-        {message.typing ? <TypingDots /> : message.text}
+        {message.typing ? <TypingDots /> : <span>{message.text}</span>}
+
+        {!message.typing && (
+          <span className="message-time">{message.time || ""}</span>
+        )}
       </div>
     </div>
   );

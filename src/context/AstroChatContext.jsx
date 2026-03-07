@@ -9,82 +9,191 @@ export function AstroChatProvider({ children }) {
       name: "SN 1987A",
       type: "Supernova",
       galaxy: "LMC",
-      // Imagen real de la NASA
-      image: "/sn1987a.jpg"
+      year: "1987",
+      distance: "168,000 años luz",
+      description:
+        "Una de las supernovas más estudiadas de la historia moderna, observada en la Gran Nube de Magallanes.",
+      image: "/sn1987a.jpg",
     },
     {
       id: "cassiopeiaA",
       name: "Cassiopeia A",
       type: "Supernova Remnant",
       galaxy: "Milky Way",
-      // Imagen del observatorio Chandra
-      image: "/Cassiopeia_A.jpg"
+      year: "ca. 1680",
+      distance: "11,000 años luz",
+      description:
+        "Uno de los remanentes de supernova más brillantes de la Vía Láctea, muy observado en radio y rayos X.",
+      image: "/Cassiopeia_A.jpg",
     },
     {
       id: "sn1006",
       name: "SN 1006",
       type: "Supernova",
       galaxy: "Milky Way",
-      // Imagen histórica
-      image: "/sn1006.jpg"
+      year: "1006",
+      distance: "7,200 años luz",
+      description:
+        "Una de las supernovas más brillantes registradas por la humanidad, visible a simple vista en el año 1006.",
+      image: "/sn1006.jpg",
     },
   ]);
 
+  const [favorites, setFavorites] = useState(() => {
+    const savedFavorites = localStorage.getItem("astrochat-favorites");
+    return savedFavorites
+      ? JSON.parse(savedFavorites)
+      : ["sn1987a", "cassiopeiaA"];
+  });
+
+  const initialMessages = {
+    sn1987a: [
+      {
+        sender: "bot",
+        text: "Explosión detectada en 1987 👀",
+        time: "18:42",
+      },
+    ],
+    cassiopeiaA: [
+      {
+        sender: "bot",
+        text: "Uno de los remanentes más brillantes en radio 📡",
+        time: "17:15",
+      },
+    ],
+    sn1006: [],
+  };
+
   const [messages, setMessages] = useState(() => {
     const savedMessages = localStorage.getItem("astrochat-messages");
-    return savedMessages
-      ? JSON.parse(savedMessages)
-      : {
-          sn1987a: [{ sender: "bot", text: "Explosión detectada en 1987 👀" }],
-          cassiopeiaA: [{ sender: "bot", text: "Uno de los remanentes más brillantes en radio 📡" }],
-          sn1006: [],
-        };
+    return savedMessages ? JSON.parse(savedMessages) : initialMessages;
   });
 
   useEffect(() => {
     localStorage.setItem("astrochat-messages", JSON.stringify(messages));
   }, [messages]);
 
-function generateAstroResponse(chatId, userText) {
-  const text = userText.toLowerCase();
+  useEffect(() => {
+    localStorage.setItem("astrochat-favorites", JSON.stringify(favorites));
+  }, [favorites]);
 
-  const responses = {
-    sn1987a: [
-      "Soy SN 1987A, observada en la Gran Nube de Magallanes.",
-      "Fui clave para estudiar neutrinos provenientes de una supernova.",
-      "Mi explosión fue detectada en 1987 y marcó un antes y un después.",
-      "Soy una de las supernovas más famosas de la astronomía moderna."
-    ],
-    cassiopeiaA: [
-      "Soy Cassiopeia A, un remanente brillante en rayos X.",
-      "Mi explosión ocurrió hace unos 350 años.",
-      "Soy uno de los remanentes mejor estudiados de la Vía Láctea.",
-      "En radio, óptico y rayos X soy realmente fascinante."
-    ],
-    sn1006: [
-      "Soy SN 1006, una de las supernovas más brillantes registradas.",
-      "En el año 1006 fui visible incluso de noche con enorme intensidad.",
-      "Mi remanente todavía se estudia en distintas longitudes de onda.",
-      "Soy un objeto histórico muy importante para la astronomía."
-    ]
-  };
-
-  if (text.includes("hola")) {
-    return "¡Hola! Qué bueno verte por acá 🌌";
+  function toggleFavorite(objectId) {
+    setFavorites((prev) =>
+      prev.includes(objectId)
+        ? prev.filter((id) => id !== objectId)
+        : [...prev, objectId]
+    );
   }
 
-  if (text.includes("quién sos") || text.includes("quien sos")) {
-    return responses[chatId]?.[0] || "Soy un objeto astronómico fascinante.";
+  function getCurrentTime() {
+    const now = new Date();
+    return now.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
-  if (text.includes("gracias")) {
-    return "¡De nada! Me encanta hablar del universo ✨";
+  function clearChat(chatId) {
+    setMessages((prev) => ({
+      ...prev,
+      [chatId]: [],
+    }));
   }
 
-  const options = responses[chatId] || ["El universo es más complejo de lo que parece 🌌"];
-  const randomIndex = Math.floor(Math.random() * options.length);
-  return options[randomIndex];
-}
+  function resetChat(chatId) {
+    setMessages((prev) => ({
+      ...prev,
+      [chatId]: initialMessages[chatId] || [],
+    }));
+  }
+
+  function generateAstroResponse(chatId, userText) {
+    const text = userText.toLowerCase();
+
+    const objectData = {
+      sn1987a: {
+        intro: "Soy SN 1987A, observada en la Gran Nube de Magallanes.",
+        galaxy: "Estoy en la Gran Nube de Magallanes.",
+        distance: "Estoy a unos 168.000 años luz de la Tierra.",
+        year: "Mi explosión fue observada en 1987.",
+        type: "Soy una supernova de colapso del núcleo.",
+        extra: [
+          "Fui clave para estudiar neutrinos provenientes de una supernova.",
+          "Soy una de las supernovas más famosas de la astronomía moderna.",
+          "Mi explosión marcó un antes y un después en la astrofísica observacional.",
+        ],
+      },
+      cassiopeiaA: {
+        intro: "Soy Cassiopeia A, un remanente de supernova muy brillante.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 11.000 años luz.",
+        year: "Mi explosión ocurrió aproximadamente hacia 1680.",
+        type: "Soy un remanente de supernova muy estudiado en radio y rayos X.",
+        extra: [
+          "Soy uno de los remanentes más estudiados de la galaxia.",
+          "En rayos X me veo especialmente brillante.",
+          "En radio también soy un objeto muy importante.",
+        ],
+      },
+      sn1006: {
+        intro: "Soy SN 1006, una de las supernovas más brillantes registradas.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 7.200 años luz.",
+        year: "Fui observada en el año 1006.",
+        type: "Soy el remanente de una supernova histórica muy famosa.",
+        extra: [
+          "Mi brillo fue tan intenso que la gente podía verme con enorme claridad.",
+          "Soy un objeto histórico muy importante para la astronomía.",
+          "Mi remanente todavía se estudia en distintas longitudes de onda.",
+        ],
+      },
+    };
+
+    const current = objectData[chatId];
+
+    if (!current) {
+      return "El universo es más complejo de lo que parece 🌌";
+    }
+
+    if (text.includes("hola")) return `¡Hola! ${current.intro}`;
+    if (text.includes("quién sos") || text.includes("quien sos"))
+      return current.intro;
+    if (text.includes("galaxia")) return current.galaxy;
+    if (text.includes("distancia")) return current.distance;
+    if (
+      text.includes("año") ||
+      text.includes("cuando") ||
+      text.includes("cuándo")
+    )
+      return current.year;
+    if (text.includes("tipo")) return current.type;
+
+    if (text.includes("radio")) {
+      return "Este objeto es interesante en observaciones de radioastronomía 📡";
+    }
+
+    if (
+      text.includes("rayos x") ||
+      text.includes("rayosx") ||
+      text.includes("x-ray") ||
+      text.includes("xray")
+    ) {
+      return "También puede estudiarse en rayos X, donde revela procesos físicos muy energéticos.";
+    }
+
+    if (text.includes("neutrinos")) {
+      return chatId === "sn1987a"
+        ? "SN 1987A fue fundamental porque permitió detectar neutrinos asociados a una supernova."
+        : "Los neutrinos son clave para entender explosiones estelares muy energéticas.";
+    }
+
+    if (text.includes("gracias")) {
+      return "¡De nada! Me encanta hablar del universo ✨";
+    }
+
+    const randomIndex = Math.floor(Math.random() * current.extra.length);
+    return current.extra[randomIndex];
+  }
 
   function sendMessage(chatId, message) {
     setMessages((prev) => ({
@@ -93,7 +202,13 @@ function generateAstroResponse(chatId, userText) {
     }));
 
     if (message.sender === "user") {
-      const typingMessage = { sender: "bot", text: "...", typing: true };
+      const typingMessage = {
+        sender: "bot",
+        text: "...",
+        typing: true,
+        time: getCurrentTime(),
+      };
+
       setMessages((prev) => ({
         ...prev,
         [chatId]: [...(prev[chatId] || []), typingMessage],
@@ -103,10 +218,12 @@ function generateAstroResponse(chatId, userText) {
         const botMessage = {
           sender: "bot",
           text: generateAstroResponse(chatId, message.text),
+          time: getCurrentTime(),
         };
+
         setMessages((prev) => {
           const updated = [...(prev[chatId] || [])];
-          updated.pop(); // Quitar el "typing..."
+          updated.pop();
           return { ...prev, [chatId]: [...updated, botMessage] };
         });
       }, 1500);
@@ -114,7 +231,17 @@ function generateAstroResponse(chatId, userText) {
   }
 
   return (
-    <AstroChatContext.Provider value={{ objects, messages, sendMessage }}>
+    <AstroChatContext.Provider
+      value={{
+        objects,
+        messages,
+        favorites,
+        toggleFavorite,
+        sendMessage,
+        clearChat,
+        resetChat,
+      }}
+    >
       {children}
     </AstroChatContext.Provider>
   );

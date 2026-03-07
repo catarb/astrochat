@@ -3,7 +3,9 @@ import { AstroChatContext } from "../context/AstroChatContext";
 import { NavLink, useSearchParams } from "react-router-dom";
 
 function Sidebar() {
-  const { objects, messages } = useContext(AstroChatContext);
+  const { objects, messages, favorites, unreadCounts } =
+    useContext(AstroChatContext);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") || "";
 
@@ -11,9 +13,16 @@ function Sidebar() {
     setSearchParams({ search: e.target.value });
   }
 
-  const filteredObjects = objects.filter((obj) =>
-    obj.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredObjects = objects
+    .filter((obj) => obj.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      const aFav = favorites.includes(a.id);
+      const bFav = favorites.includes(b.id);
+
+      if (aFav && !bFav) return -1;
+      if (!aFav && bFav) return 1;
+      return 0;
+    });
 
   function getLastMessageText(objectId) {
     const chatMessages = messages[objectId] || [];
@@ -31,29 +40,30 @@ function Sidebar() {
     return lastMessage.text;
   }
 
-  function getFakeTime(objectId) {
-    const fakeTimes = {
-      sn1987a: "18:42",
-      cassiopeiaA: "17:15",
-      sn1006: "12:08",
-    };
+  function getLastMessageTime(objectId) {
+    const chatMessages = messages[objectId] || [];
 
-    return fakeTimes[objectId] || "09:30";
+    if (chatMessages.length === 0) {
+      const fallbackTimes = {
+        sn1987a: "18:42",
+        cassiopeiaA: "17:15",
+        sn1006: "12:08",
+      };
+
+      return fallbackTimes[objectId] || "";
+    }
+
+    const lastMessage = chatMessages[chatMessages.length - 1];
+    return lastMessage.time || "";
   }
 
-function getUnreadCount(objectId) {
-  const fakeUnread = {
-    sn1987a: 1,
-    cassiopeiaA: 2,
-    sn1006: 0,
-  };
-
-  return fakeUnread[objectId] || 0;
-}
+  function getUnreadCount(objectId) {
+    return unreadCounts?.[objectId] || 0;
+  }
 
   return (
     <div className="sidebar">
-      <h2 style={{ marginBottom: "20px", color: "#e2e8f0" }}>AstroChat 🌌</h2>
+      <h1 className="sidebar-title">AstroChat 🌌</h1>
 
       <input
         type="text"
@@ -63,9 +73,11 @@ function getUnreadCount(objectId) {
         className="search-input"
       />
 
-      <div className="chat-list" style={{ marginTop: "20px" }}>
+
+      <div className="chat-list">
         {filteredObjects.map((obj) => {
           const unreadCount = getUnreadCount(obj.id);
+          const isFavorite = favorites.includes(obj.id);
 
           return (
             <NavLink
@@ -87,8 +99,10 @@ function getUnreadCount(objectId) {
 
               <div className="chat-info">
                 <div className="chat-top-row">
-                  <h4>{obj.name}</h4>
-                  <span className="chat-time">{getFakeTime(obj.id)}</span>
+                  <h4>
+                    {obj.name} {isFavorite && "⭐"}
+                  </h4>
+                  <span className="chat-time">{getLastMessageTime(obj.id)}</span>
                 </div>
 
                 <p className="chat-type">{obj.type}</p>
