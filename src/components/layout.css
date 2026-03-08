@@ -7,8 +7,8 @@
 html,
 body,
 #root {
-  min-height: 100%;
-  height: auto;
+  width: 100%;
+  min-height: 100dvh;
   font-family: Arial, sans-serif;
   background-color: #0b141a;
   color: #f1f5f9;
@@ -64,6 +64,7 @@ body,
   color: white;
   outline: none;
   font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .search-input::placeholder {
@@ -192,6 +193,7 @@ body,
   background-color: #0b141a;
   min-width: 0;
 }
+
 .chat-header {
   display: flex;
   align-items: center;
@@ -271,10 +273,8 @@ body,
     radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08) 0, transparent 120px),
     radial-gradient(circle at 80% 30%, rgba(147, 51, 234, 0.06) 0, transparent 140px),
     linear-gradient(180deg, #08111a 0%, #0b141a 100%);
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
-
-
 
 .messages-list::before,
 .messages-list::after {
@@ -381,13 +381,14 @@ body,
   flex: 1;
   height: 48px;
   padding: 0 16px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 999px;
   background-color: #2a3942;
   color: white;
   font-size: 14px;
   outline: none;
   min-width: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .message-input::placeholder {
@@ -490,7 +491,7 @@ body,
   font-size: 18px;
   border-radius: 50%;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -805,249 +806,12 @@ body,
   background: #3b4b56;
 }
 
+/* LOGIN */
+
 .login-page {
+  position: relative;
+  width: 100%;
   min-height: 100dvh;
-  width: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: #111b21;
-  padding: 40px;
-  border-radius: 16px;
-  width: 320px;
-  position: relative;
-  z-index: 2;
-}
-
-.login-form h1 {
-  text-align: center;
-}
-
-.login-form input {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #2a3942;
-  background: #202c33;
-  color: white;
-}
-
-.login-form button {
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #25d366;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* LOGIN VIDEO BACKGROUND */
-
-.login-page {
-  height: 100vh;
-  width: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.login-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -1;
-}
-
-/* formulario */
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: rgba(17, 27, 33, 0.9);
-  backdrop-filter: blur(8px);
-  padding: 40px;
-  border-radius: 16px;
-  width: 320px;
-}
-
-.login-form h1 {
-  text-align: center;
-}
-
-.login-form input {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #2a3942;
-  background: #202c33;
-  color: white;
-}
-
-.login-form button {
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #25d366;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* RESPONSIVE TABLET */
-
-@media (max-width: 768px) {
-  .whatsapp-layout {
-    flex-direction: column;
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .leftbar {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-right: none;
-    border-bottom: 1px solid #2a3942;
-  }
-
-  .leftbar-bottom {
-    margin-top: 0;
-    padding-bottom: 0;
-  }
-
-  .leftbar-tooltip {
-    display: none;
-  }
-
-  .sidebar {
-    min-width: 100dvh;
-    max-height: none;
-    border-right: none;
-    border-bottom: 1px solid #2a3942;
-    padding: 14px;
-    overflow: visible;
-  }
-
-  .chat-area {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .chat-container {
-    height: auto;
-    min-height: 60vh;
-  }
-
-  .chat-header {
-    padding: 10px 12px;
-    gap: 8px;
-  }
-
-  .chat-header-left {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .chat-header-info h2,
-  .chat-header-info p {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .chat-header-actions {
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .header-icon-button,
-  .back-button {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  .chat-avatar,
-  .astro-avatar {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
-  }
-
-  .quick-questions {
-    padding: 8px 12px;
-    gap: 6px;
-  }
-
-  .quick-question-btn {
-    font-size: 11px;
-    padding: 7px 10px;
-  }
-
-  .messages-list {
-    padding: 14px 12px;
-  }
-
-  .message-bubble {
-    max-width: 88%;
-    font-size: 13px;
-  }
-
-  .message-input-wrapper {
-    padding: 10px 12px;
-  }
-
-.message-input {
-  flex: 1;
-  height: 48px;
-  padding: 0 16px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background-color: #2a3942;
-  color: white;
-  font-size: 14px;
-  outline: none;
-  min-width: 0;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-  .object-profile {
-    padding: 14px;
-  }
-
-  .object-profile-image {
-    width: 72px;
-    height: 72px;
-  }
-
-  .chat-menu {
-    right: 0;
-    min-width: 160px;
-  }
-}
-
-/* LOGIN CON VIDEO */
-
-.login-page {
-  position: relative;
-  width: 100%;
-  height: 100vh;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -1134,12 +898,142 @@ body,
   transform: scale(0.98);
 }
 
+/* RESPONSIVE TABLET */
+
+@media (max-width: 768px) {
+  .whatsapp-layout {
+    flex-direction: column;
+    min-height: 100dvh;
+    height: auto;
+  }
+
+  .leftbar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-right: none;
+    border-bottom: 1px solid #2a3942;
+  }
+
+  .leftbar-bottom {
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+
+  .leftbar-tooltip {
+    display: none;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid #2a3942;
+    padding: 14px;
+    overflow: visible;
+  }
+
+  .chat-area {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .chat-container {
+    height: auto;
+    min-height: 60vh;
+  }
+
+  .chat-header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .chat-header-left {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .chat-header-info h2,
+  .chat-header-info p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-header-actions {
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .header-icon-button,
+  .back-button {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .chat-avatar,
+  .astro-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .quick-questions {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .quick-question-btn {
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+
+  .messages-list {
+    padding: 14px 12px;
+  }
+
+  .message-bubble {
+    max-width: 88%;
+    font-size: 13px;
+  }
+
+  .message-input-wrapper {
+    padding: 10px 12px;
+  }
+
+  .message-input {
+    height: 48px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+
+  .object-profile {
+    padding: 14px;
+  }
+
+  .object-profile-image {
+    width: 72px;
+    height: 72px;
+  }
+
+  .chat-menu {
+    right: 0;
+    min-width: 160px;
+  }
+}
+
 /* RESPONSIVE MOBILE: SOLO UNA VISTA A LA VEZ */
 
 @media (max-width: 768px) {
   .whatsapp-layout {
     display: block;
-    min-height: 100vh;
+    min-height: 100dvh;
     height: auto;
     overflow: hidden;
   }
@@ -1150,7 +1044,7 @@ body,
 
   .sidebar {
     width: 100%;
-    min-height: 100vh;
+    min-height: 100dvh;
     max-height: none;
     border-right: none;
     border-bottom: none;
@@ -1174,25 +1068,14 @@ body,
   }
 
   .whatsapp-layout.chat-open .chat-container {
-    height: 100vh;
-    min-height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
   }
 
   .sidebar-title {
     font-size: 1.9rem;
     margin-bottom: 20px;
   }
-.search-input {
-  width: 100%;
-  padding: 12px 14px;
-  background-color: #202c33;
-  border: 1px solid #334155;
-  border-radius: 14px;
-  color: white;
-  outline: none;
-  font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
 
   .chat-list {
     gap: 0;
@@ -1344,5 +1227,19 @@ body,
   .tooltip-text,
   .leftbar-tooltip {
     display: none;
+  }
+
+  .login-page {
+    min-height: 100dvh;
+    padding: 16px;
+  }
+
+  .login-form {
+    width: min(340px, 100%);
+    padding: 28px 20px;
+  }
+
+  .login-form h1 {
+    font-size: 1.8rem;
   }
 }
