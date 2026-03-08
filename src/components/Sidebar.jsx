@@ -9,12 +9,16 @@ function Sidebar() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") || "";
 
+  const user = localStorage.getItem("astrochat_user");
+  const avatar = localStorage.getItem("astrochat_avatar");
+
   function handleSearch(e) {
     setSearchParams({ search: e.target.value });
   }
 
   function handleLogout() {
     localStorage.removeItem("astrochat_user");
+    localStorage.removeItem("astrochat_avatar");
     window.location.href = "/";
   }
 
@@ -69,7 +73,15 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div className="mobile-topbar">
-        <h1 className="sidebar-title">AstroChat 🌌</h1>
+        <div className="mobile-topbar-left">
+          <img
+            src={avatar || "https://i.pravatar.cc/150?img=12"}
+            alt={user || "Usuario"}
+            className="mobile-user-avatar"
+          />
+          <h1 className="sidebar-title">AstroChat 🌌</h1>
+        </div>
+
         <button className="logout-mobile-button" onClick={handleLogout}>
           ⎋ Salir
         </button>
