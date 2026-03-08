@@ -9,13 +9,11 @@ body,
 #root {
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
-  background-color: #0b141a;
+  background-color: #08111a;
   color: #f1f5f9;
-  overflow-x: hidden;
-}
-
-body {
   overflow: hidden;
 }
 
@@ -676,7 +674,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* MENU DE OPCIONES DEL CHAT (⋮) */
+/* MENU DE OPCIONES DEL CHAT */
 
 .chat-menu-wrapper {
   position: relative;
@@ -721,7 +719,7 @@ body {
   border-bottom-right-radius: 10px;
 }
 
-/* TOOLTIPS DE LA LEFT BAR */
+/* TOOLTIPS */
 
 .leftbar-tooltip-wrapper {
   position: relative;
@@ -754,8 +752,6 @@ body {
   visibility: visible;
   transform: translateY(-50%) translateX(4px);
 }
-
-/* TOOLTIPS HEADER ICONS */
 
 .tooltip-wrapper {
   position: relative;
@@ -815,28 +811,26 @@ body {
 .login-page {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100svh;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #08111a;
+  background: #08111a;
   padding: 16px;
 }
 
 .login-video {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
-  z-index: 0;
   pointer-events: none;
+  z-index: 0;
 }
 
 .login-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(4, 10, 20, 0.45);
   z-index: 1;
@@ -845,7 +839,7 @@ body {
 .login-form {
   position: relative;
   z-index: 2;
-  width: min(360px, 90%);
+  width: min(360px, 100%);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -905,137 +899,7 @@ body {
   transform: scale(0.98);
 }
 
-/* RESPONSIVE TABLET */
-
-@media (max-width: 768px) {
-  .whatsapp-layout {
-    flex-direction: column;
-    min-height: 100dvh;
-    height: auto;
-  }
-
-  .leftbar {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-right: none;
-    border-bottom: 1px solid #2a3942;
-  }
-
-  .leftbar-bottom {
-    margin-top: 0;
-    padding-bottom: 0;
-  }
-
-  .leftbar-tooltip {
-    display: none;
-  }
-
-  .sidebar {
-    width: 100%;
-    max-height: none;
-    border-right: none;
-    border-bottom: 1px solid #2a3942;
-    padding: 14px;
-    overflow: visible;
-  }
-
-  .chat-area {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .chat-container {
-    height: auto;
-    min-height: 60vh;
-  }
-
-  .chat-header {
-    padding: 10px 12px;
-    gap: 8px;
-  }
-
-  .chat-header-left {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .chat-header-info h2,
-  .chat-header-info p {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .chat-header-actions {
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .header-icon-button,
-  .back-button {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  .chat-avatar,
-  .astro-avatar {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
-  }
-
-  .quick-questions {
-    padding: 8px 12px;
-    gap: 6px;
-  }
-
-  .quick-question-btn {
-    font-size: 11px;
-    padding: 7px 10px;
-  }
-
-  .messages-list {
-    padding: 14px 12px;
-  }
-
-  .message-bubble {
-    max-width: 88%;
-    font-size: 13px;
-  }
-
-  .message-input-wrapper {
-    padding: 10px 12px;
-  }
-
-  .message-input {
-    height: 48px;
-    padding: 0 16px;
-    font-size: 14px;
-  }
-
-  .object-profile {
-    padding: 14px;
-  }
-
-  .object-profile-image {
-    width: 72px;
-    height: 72px;
-  }
-
-  .chat-menu {
-    right: 0;
-    min-width: 160px;
-  }
-}
-
-/* RESPONSIVE MOBILE: SOLO UNA VISTA A LA VEZ */
+/* RESPONSIVE */
 
 @media (max-width: 768px) {
   .whatsapp-layout {
@@ -1237,7 +1101,6 @@ body {
   }
 
   .login-page {
-    min-height: 100dvh;
     padding: 16px;
   }
 
