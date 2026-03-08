@@ -4,7 +4,14 @@ import { AstroChatContext } from "../context/AstroChatContext";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
 import QuickQuestions from "../components/QuickQuestions";
-import { Info } from "lucide-react";
+
+import {
+  ArrowLeft,
+  Star,
+  Search,
+  MoreVertical,
+  Info,
+} from "lucide-react";
 
 function Chat() {
   const { id } = useParams();
@@ -76,7 +83,7 @@ function Chat() {
       <div className="chat-header">
         <div className="chat-header-left">
           <button onClick={() => navigate("/")} className="back-button">
-            ←
+            <ArrowLeft size={20} />
           </button>
 
           <img
@@ -96,20 +103,25 @@ function Chat() {
         </div>
 
         <div className="chat-header-actions">
+          {/* FAVORITO */}
           <div className="tooltip-wrapper">
             <button
               type="button"
-              className="header-icon-button"
+              className={`header-icon-button ${
+                isFavorite ? "favorite-active" : ""
+              }`}
               aria-label="Marcar favorito"
               onClick={() => toggleFavorite(id)}
             >
-              {isFavorite ? "★" : "☆"}
+              <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
             </button>
+
             <span className="tooltip-text">
               {isFavorite ? "Quitar favorito" : "Marcar favorito"}
             </span>
           </div>
 
+          {/* INFO */}
           <div className="tooltip-wrapper">
             <button
               type="button"
@@ -119,9 +131,11 @@ function Chat() {
             >
               <Info size={18} />
             </button>
+
             <span className="tooltip-text">Información del objeto</span>
           </div>
 
+          {/* BUSCAR */}
           <div className="tooltip-wrapper">
             <button
               type="button"
@@ -133,11 +147,13 @@ function Chat() {
                 setShowMenu(false);
               }}
             >
-              🔍
+              <Search size={18} />
             </button>
+
             <span className="tooltip-text">Buscar en el chat</span>
           </div>
 
+          {/* MENU */}
           <div className="chat-menu-wrapper tooltip-wrapper">
             <button
               type="button"
@@ -145,8 +161,9 @@ function Chat() {
               aria-label="Más opciones"
               onClick={() => setShowMenu((prev) => !prev)}
             >
-              ⋮
+              <MoreVertical size={18} />
             </button>
+
             <span className="tooltip-text">Más opciones</span>
 
             {showMenu && (
@@ -218,12 +235,15 @@ function Chat() {
           <p>
             <strong>Tipo:</strong> {currentObject.type}
           </p>
+
           <p>
             <strong>Galaxia:</strong> {currentObject.galaxy}
           </p>
+
           <p>
             <strong>Año:</strong> {currentObject.year}
           </p>
+
           <p>
             <strong>Distancia:</strong> {currentObject.distance}
           </p>
