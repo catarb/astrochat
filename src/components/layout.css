@@ -299,6 +299,10 @@ html {
   background-color: #2a3942;
 }
 
+.favorite-active {
+  color: #facc15;
+}
+
 .chat-avatar {
   width: 50px;
   height: 50px;
@@ -308,6 +312,14 @@ html {
   object-fit: cover;
   border: 2px solid #3b82f6;
   display: block;
+}
+
+.chat-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .messages-list {
@@ -964,15 +976,6 @@ html {
   transform: scale(0.98);
 }
 
-.chat-body {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-
 /* RESPONSIVE */
 
 @media (max-width: 768px) {
@@ -1047,32 +1050,81 @@ html {
   }
 
   .whatsapp-layout.chat-open .chat-area {
-    display: flex;
+    display: block;
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100dvh;
-    min-width: 0;
-    min-height: 0;
     overflow: hidden;
     background: #0b141a;
   }
 
   .whatsapp-layout.chat-open .chat-container {
-    display: flex;
-    flex-direction: column;
+    position: fixed;
+    inset: 0;
     width: 100%;
     height: 100dvh;
-    min-height: 0;
     overflow: hidden;
+    background: #0b141a;
+  }
+
+  .chat-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    padding: 10px;
+    gap: 8px;
+    background-color: #202c33;
+    border-bottom: 1px solid #2a3942;
+    z-index: 40;
   }
 
   .chat-body {
-    flex: 1;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    bottom: 64px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+  }
+
+  .chat-search-bar,
+  .quick-questions,
+  .object-profile {
+    flex-shrink: 0;
+  }
+
+  .messages-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 10px;
+  }
+
+  .message-input-wrapper {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-height: 64px;
+    padding: 8px 10px;
+    background: rgba(32, 44, 51, 0.98);
+    border-top: 1px solid #2a3942;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    z-index: 40;
+  }
+
+  .message-form {
+    align-items: center;
   }
 
   .sidebar-title {
@@ -1130,15 +1182,6 @@ html {
     font-size: 11px;
   }
 
-  .chat-header {
-    padding: 10px;
-    gap: 8px;
-    background-color: #202c33;
-    border-bottom: 1px solid #2a3942;
-    flex-shrink: 0;
-    z-index: 20;
-  }
-
   .chat-header-left {
     flex: 1;
     min-width: 0;
@@ -1176,21 +1219,6 @@ html {
     min-height: 40px;
   }
 
-  .chat-search-bar,
-  .quick-questions,
-  .object-profile {
-    flex-shrink: 0;
-  }
-
-  .messages-list {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    padding: 12px 10px;
-  }
-
   .message-bubble {
     max-width: 90%;
     font-size: 13px;
@@ -1201,18 +1229,9 @@ html {
     font-size: 10px;
   }
 
-  .message-input-wrapper {
-    flex-shrink: 0;
-    padding: 8px 10px;
-    background: rgba(32, 44, 51, 0.98);
-    border-top: 1px solid #2a3942;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
-    z-index: 20;
-  }
-
   .message-input {
     height: 40px;
-    font-size: 13px;
+    font-size: 16px;
     padding: 0 14px;
   }
 
