@@ -8,11 +8,15 @@ html,
 body,
 #root {
   width: 100%;
-  min-height: 100dvh;
+  height: 100%;
   font-family: Arial, sans-serif;
   background-color: #0b141a;
   color: #f1f5f9;
   overflow-x: hidden;
+}
+
+body {
+  overflow: hidden;
 }
 
 /* LAYOUT GENERAL */
@@ -809,14 +813,16 @@ body,
 /* LOGIN */
 
 .login-page {
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: 100%;
-  min-height: 100dvh;
+  height: 100svh;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #08111a;
+  padding: 16px;
 }
 
 .login-video {
@@ -826,6 +832,7 @@ body,
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  pointer-events: none;
 }
 
 .login-overlay {
