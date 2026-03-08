@@ -10,20 +10,40 @@ function Login() {
 
   useEffect(() => {
     const video = videoRef.current;
-
     if (!video) return;
 
     video.muted = true;
+    video.defaultMuted = true;
     video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
 
-    const playPromise = video.play();
+    const tryPlay = () => {
+      const promise = video.play();
+      if (promise?.catch) {
+        promise.catch(() => {});
+      }
+    };
 
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Safari móvil a veces bloquea el autoplay.
-        // Dejamos el intento silencioso para no romper la UI.
-      });
-    }
+    const onCanPlay = () => {
+      tryPlay();
+    };
+
+    const onFirstTouch = () => {
+      tryPlay();
+      window.removeEventListener("touchstart", onFirstTouch);
+    };
+
+    video.addEventListener("canplay", onCanPlay);
+    window.addEventListener("touchstart", onFirstTouch, { passive: true });
+
+    tryPlay();
+
+    return () => {
+      video.removeEventListener("canplay", onCanPlay);
+      window.removeEventListener("touchstart", onFirstTouch);
+    };
   }, []);
 
   function handleSubmit(e) {
@@ -44,7 +64,7 @@ function Login() {
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         className="login-video"
       >
         <source src="/video_fondo.mp4" type="video/mp4" />
