@@ -6,8 +6,14 @@ function LeftBar() {
   const isChatsActive =
     location.pathname === "/" || location.pathname.startsWith("/chat/");
 
+  function handleLogout() {
+    localStorage.removeItem("astrochat_user");
+    window.location.href = "/";
+  }
+
   return (
     <div className="leftbar">
+      {/* Chats */}
       <div className="leftbar-tooltip-wrapper">
         <NavLink
           to="/"
@@ -19,6 +25,7 @@ function LeftBar() {
         <span className="leftbar-tooltip">Chats</span>
       </div>
 
+      {/* Favoritos */}
       <div className="leftbar-tooltip-wrapper">
         <NavLink
           to="/favorites"
@@ -32,6 +39,7 @@ function LeftBar() {
         <span className="leftbar-tooltip">Favoritos</span>
       </div>
 
+      {/* Objetos */}
       <div className="leftbar-tooltip-wrapper">
         <NavLink
           to="/objects"
@@ -45,18 +53,18 @@ function LeftBar() {
         <span className="leftbar-tooltip">Objetos</span>
       </div>
 
+      {/* Logout */}
       <div className="leftbar-bottom">
         <div className="leftbar-tooltip-wrapper">
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              isActive ? "leftbar-btn active" : "leftbar-btn"
-            }
-            aria-label="Ajustes"
+          <button
+            type="button"
+            className="leftbar-btn"
+            onClick={handleLogout}
+            aria-label="Cerrar sesión"
           >
-            ⚙️
-          </NavLink>
-          <span className="leftbar-tooltip">Ajustes</span>
+            🚪
+          </button>
+          <span className="leftbar-tooltip">Cerrar sesión</span>
         </div>
       </div>
     </div>
