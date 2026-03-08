@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useState, useEffect } from "react";
 import { AstroChatContext } from "../context/AstroChatContext";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
@@ -43,6 +43,36 @@ function Chat() {
       (msg.text || "").toLowerCase().includes(searchText.toLowerCase())
     );
   }, [currentMessages, searchText]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    function updateViewportHeight() {
+      const vv = window.visualViewport;
+      const height = vv ? vv.height : window.innerHeight;
+      root.style.setProperty("--app-height", `${height}px`);
+    }
+
+    updateViewportHeight();
+
+    window.addEventListener("resize", updateViewportHeight);
+    window.addEventListener("orientationchange", updateViewportHeight);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", updateViewportHeight);
+      window.visualViewport.addEventListener("scroll", updateViewportHeight);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateViewportHeight);
+      window.removeEventListener("orientationchange", updateViewportHeight);
+
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", updateViewportHeight);
+        window.visualViewport.removeEventListener("scroll", updateViewportHeight);
+      }
+    };
+  }, []);
 
   if (!currentObject) {
     return (
@@ -116,7 +146,6 @@ function Chat() {
             >
               <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
             </button>
-
             <span className="tooltip-text">
               {isFavorite ? "Quitar favorito" : "Marcar favorito"}
             </span>
@@ -131,7 +160,6 @@ function Chat() {
             >
               <Info size={18} />
             </button>
-
             <span className="tooltip-text">Información del objeto</span>
           </div>
 
@@ -148,7 +176,6 @@ function Chat() {
             >
               <Search size={18} />
             </button>
-
             <span className="tooltip-text">Buscar en el chat</span>
           </div>
 
@@ -234,15 +261,12 @@ function Chat() {
             <p>
               <strong>Tipo:</strong> {currentObject.type}
             </p>
-
             <p>
               <strong>Galaxia:</strong> {currentObject.galaxy}
             </p>
-
             <p>
               <strong>Año:</strong> {currentObject.year}
             </p>
-
             <p>
               <strong>Distancia:</strong> {currentObject.distance}
             </p>
