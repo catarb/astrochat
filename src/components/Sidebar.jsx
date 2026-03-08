@@ -1,12 +1,11 @@
 import { useContext } from "react";
 import { AstroChatContext } from "../context/AstroChatContext";
-import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 
 function Sidebar() {
   const { objects, messages, favorites, unreadCounts } =
     useContext(AstroChatContext);
 
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") || "";
 
@@ -16,8 +15,7 @@ function Sidebar() {
 
   function handleLogout() {
     localStorage.removeItem("astrochat_user");
-    navigate("/login");
-    window.location.reload();
+    window.location.href = "/";
   }
 
   const filteredObjects = objects
@@ -72,9 +70,9 @@ function Sidebar() {
     <div className="sidebar">
       <div className="mobile-topbar">
         <h1 className="sidebar-title">AstroChat 🌌</h1>
-<button className="logout-mobile-button" onClick={handleLogout}>
-  ⎋ Salir
-</button>
+        <button className="logout-mobile-button" onClick={handleLogout}>
+          ⎋ Salir
+        </button>
       </div>
 
       <h1 className="sidebar-title desktop-title">AstroChat 🌌</h1>
