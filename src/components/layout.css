@@ -244,6 +244,7 @@ html {
   padding: 14px 18px;
   border-bottom: 1px solid #2a3942;
   background-color: #202c33;
+  min-height: 72px;
 }
 
 .chat-header-left {
@@ -272,8 +273,10 @@ html {
 .chat-header-actions {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   flex-shrink: 0;
+  height: 100%;
 }
 
 .header-icon-button {
@@ -286,6 +289,10 @@ html {
   border-radius: 50%;
   cursor: pointer;
   transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .header-icon-button:hover {
