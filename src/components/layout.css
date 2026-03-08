@@ -597,6 +597,21 @@ html {
   padding-bottom: 12px;
 }
 
+.user-avatar-wrapper {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.user-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.35);
+}
+
 /* ANIMACIONES DEL FONDO */
 
 @keyframes driftStars {

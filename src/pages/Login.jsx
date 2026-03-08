@@ -7,12 +7,15 @@ function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    localStorage.setItem("astrochat_user", user || "invitado");
-    navigate("/");
-    window.location.reload();
-  }
+function handleSubmit(e) {
+  e.preventDefault();
+
+  localStorage.setItem("astrochat_user", user || "invitado");
+  localStorage.setItem("astrochat_avatar", "https://i.pravatar.cc/150?img=12");
+
+  navigate("/");
+  window.location.reload();
+}
 
   return (
     <div className="login-page">
