@@ -966,6 +966,8 @@ html {
 
 /* RESPONSIVE */
 
+/* RESPONSIVE */
+
 @media (max-width: 768px) {
   .whatsapp-layout {
     display: block;
@@ -989,34 +991,35 @@ html {
     background: linear-gradient(180deg, #08111a 0%, #0b141a 100%);
   }
 
-.mobile-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-}
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
 
-.mobile-topbar .sidebar-title {
-  margin: 0;
-  font-size: 1.5rem;
-}
+  .mobile-topbar .sidebar-title {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
   .mobile-topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
 
-.mobile-user-avatar {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.35);
-}
+  .mobile-user-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.35);
+  }
 
   .desktop-title {
     display: none;
@@ -1041,7 +1044,7 @@ html {
     position: fixed;
     inset: 0;
     width: 100%;
-    height: 100%;
+    height: 100dvh;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
@@ -1052,16 +1055,16 @@ html {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
+    height: 100dvh;
     min-height: 0;
     overflow: hidden;
   }
 
+  .chat-header,
   .chat-search-bar,
   .quick-questions,
-  .message-input-wrapper,
-  .chat-header,
-  .object-profile {
+  .object-profile,
+  .message-input-wrapper {
     flex-shrink: 0;
   }
 
@@ -1123,6 +1126,10 @@ html {
   .chat-header {
     padding: 10px;
     gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background-color: #202c33;
   }
 
   .chat-header-left {
@@ -1163,6 +1170,11 @@ html {
   }
 
   .messages-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     padding: 12px 10px;
   }
 
@@ -1177,7 +1189,13 @@ html {
   }
 
   .message-input-wrapper {
+    position: sticky;
+    bottom: 0;
+    z-index: 25;
     padding: 8px 10px;
+    background: rgba(32, 44, 51, 0.98);
+    border-top: 1px solid #2a3942;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
   }
 
   .message-input {
