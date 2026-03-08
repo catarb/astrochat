@@ -47,8 +47,10 @@ function Chat() {
   if (!currentObject) {
     return (
       <div className="chat-container">
-        <div className="messages-list">
-          <p style={{ color: "#94a3b8" }}>Objeto no encontrado.</p>
+        <div className="chat-body">
+          <div className="messages-list">
+            <p style={{ color: "#94a3b8" }}>Objeto no encontrado.</p>
+          </div>
         </div>
       </div>
     );
@@ -103,7 +105,6 @@ function Chat() {
         </div>
 
         <div className="chat-header-actions">
-          {/* FAVORITO */}
           <div className="tooltip-wrapper">
             <button
               type="button"
@@ -121,7 +122,6 @@ function Chat() {
             </span>
           </div>
 
-          {/* INFO */}
           <div className="tooltip-wrapper">
             <button
               type="button"
@@ -135,7 +135,6 @@ function Chat() {
             <span className="tooltip-text">Información del objeto</span>
           </div>
 
-          {/* BUSCAR */}
           <div className="tooltip-wrapper">
             <button
               type="button"
@@ -153,7 +152,6 @@ function Chat() {
             <span className="tooltip-text">Buscar en el chat</span>
           </div>
 
-          {/* MENU */}
           <div className="chat-menu-wrapper tooltip-wrapper">
             <button
               type="button"
@@ -206,60 +204,62 @@ function Chat() {
         </div>
       </div>
 
-      {showSearch && (
-        <div className="chat-search-bar">
-          <input
-            type="text"
-            className="chat-search-input"
-            placeholder="Buscar en la conversación..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        </div>
-      )}
-
-      {showProfile && (
-        <div className="object-profile">
-          <img
-            src={currentObject.image}
-            alt={currentObject.name}
-            className="object-profile-image"
-            onError={(e) => {
-              e.target.src =
-                "https://via.placeholder.com/150/1e293b/ffffff?text=Astro";
-            }}
-          />
-
-          <h3>{currentObject.name}</h3>
-
-          <p>
-            <strong>Tipo:</strong> {currentObject.type}
-          </p>
-
-          <p>
-            <strong>Galaxia:</strong> {currentObject.galaxy}
-          </p>
-
-          <p>
-            <strong>Año:</strong> {currentObject.year}
-          </p>
-
-          <p>
-            <strong>Distancia:</strong> {currentObject.distance}
-          </p>
-
-          <p className="object-description">{currentObject.description}</p>
-        </div>
-      )}
-
-      {!showSearch && <QuickQuestions onAsk={handleQuickQuestion} />}
-
-      <div className="messages-list">
-        {showSearch && searchText.trim() && filteredMessages.length === 0 ? (
-          <p className="no-results">No se encontraron mensajes.</p>
-        ) : (
-          <MessageList messages={filteredMessages} />
+      <div className="chat-body">
+        {showSearch && (
+          <div className="chat-search-bar">
+            <input
+              type="text"
+              className="chat-search-input"
+              placeholder="Buscar en la conversación..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
         )}
+
+        {showProfile && (
+          <div className="object-profile">
+            <img
+              src={currentObject.image}
+              alt={currentObject.name}
+              className="object-profile-image"
+              onError={(e) => {
+                e.target.src =
+                  "https://via.placeholder.com/150/1e293b/ffffff?text=Astro";
+              }}
+            />
+
+            <h3>{currentObject.name}</h3>
+
+            <p>
+              <strong>Tipo:</strong> {currentObject.type}
+            </p>
+
+            <p>
+              <strong>Galaxia:</strong> {currentObject.galaxy}
+            </p>
+
+            <p>
+              <strong>Año:</strong> {currentObject.year}
+            </p>
+
+            <p>
+              <strong>Distancia:</strong> {currentObject.distance}
+            </p>
+
+            <p className="object-description">{currentObject.description}</p>
+          </div>
+        )}
+
+        {!showSearch && <QuickQuestions onAsk={handleQuickQuestion} />}
+
+        <div className="messages-list">
+          {showSearch && searchText.trim() && filteredMessages.length === 0 ? (
+            <p className="no-results">No se encontraron mensajes.</p>
+          ) : (
+            <MessageList messages={filteredMessages} />
+          )}
+        </div>
       </div>
 
       <div className="message-input-wrapper">
