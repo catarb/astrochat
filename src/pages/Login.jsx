@@ -1,25 +1,52 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
+  const videoRef = useRef(null);
 
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
 
-function handleSubmit(e) {
-  e.preventDefault();
+  useEffect(() => {
+    const video = videoRef.current;
 
-  localStorage.setItem("astrochat_user", user || "invitado");
-  localStorage.setItem("astrochat_avatar", "https://i.pravatar.cc/150?img=12");
+    if (!video) return;
 
-  navigate("/");
-  window.location.reload();
-}
+    video.muted = true;
+    video.playsInline = true;
+
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Safari móvil a veces bloquea el autoplay.
+        // Dejamos el intento silencioso para no romper la UI.
+      });
+    }
+  }, []);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    localStorage.setItem("astrochat_user", user || "invitado");
+    localStorage.setItem("astrochat_avatar", "https://i.pravatar.cc/150?img=12");
+
+    navigate("/");
+    window.location.reload();
+  }
 
   return (
     <div className="login-page">
-      <video autoPlay loop muted playsInline className="login-video">
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        className="login-video"
+      >
         <source src="/video_fondo.mp4" type="video/mp4" />
       </video>
 
