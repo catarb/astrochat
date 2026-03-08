@@ -17,6 +17,10 @@ body,
   overflow: hidden;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 /* LAYOUT GENERAL */
 
 .whatsapp-layout {
@@ -1190,4 +1194,11 @@ body,
   .login-form h1 {
     font-size: 1.8rem;
   }
+}
+
+.search-input,
+.chat-search-input,
+.message-input,
+.login-form input {
+  font-size: 16px;
 }
