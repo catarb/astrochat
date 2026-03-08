@@ -47,29 +47,35 @@ function Chat() {
   useEffect(() => {
     const root = document.documentElement;
 
-    function updateViewportHeight() {
+    function updateViewportVars() {
       const vv = window.visualViewport;
-      const height = vv ? vv.height : window.innerHeight;
-      root.style.setProperty("--app-height", `${height}px`);
+
+      if (vv) {
+        root.style.setProperty("--app-height", `${vv.height}px`);
+        root.style.setProperty("--vv-top", `${vv.offsetTop}px`);
+      } else {
+        root.style.setProperty("--app-height", `${window.innerHeight}px`);
+        root.style.setProperty("--vv-top", "0px");
+      }
     }
 
-    updateViewportHeight();
+    updateViewportVars();
 
-    window.addEventListener("resize", updateViewportHeight);
-    window.addEventListener("orientationchange", updateViewportHeight);
+    window.addEventListener("resize", updateViewportVars);
+    window.addEventListener("orientationchange", updateViewportVars);
 
     if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", updateViewportHeight);
-      window.visualViewport.addEventListener("scroll", updateViewportHeight);
+      window.visualViewport.addEventListener("resize", updateViewportVars);
+      window.visualViewport.addEventListener("scroll", updateViewportVars);
     }
 
     return () => {
-      window.removeEventListener("resize", updateViewportHeight);
-      window.removeEventListener("orientationchange", updateViewportHeight);
+      window.removeEventListener("resize", updateViewportVars);
+      window.removeEventListener("orientationchange", updateViewportVars);
 
       if (window.visualViewport) {
-        window.visualViewport.removeEventListener("resize", updateViewportHeight);
-        window.visualViewport.removeEventListener("scroll", updateViewportHeight);
+        window.visualViewport.removeEventListener("resize", updateViewportVars);
+        window.visualViewport.removeEventListener("scroll", updateViewportVars);
       }
     };
   }, []);
