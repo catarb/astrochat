@@ -1117,6 +1117,7 @@ html {
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #08111a 0%, #0b141a 100%);
+  overscroll-behavior: none;
 }
 
 .sidebar-top {
@@ -1271,16 +1272,18 @@ html {
   }
 
 .chat-list {
-  flex: 1;
-  min-height: 0;
+  height: calc(var(--app-height) - var(--vv-top) - 126px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none;
   touch-action: pan-y;
+
+  display: flex;
+  flex-direction: column;
   gap: 0;
   margin: 0;
-  padding: 0 16px 0 16px;
+  padding: 0 16px 12px 16px;
 }
 
   .chat-item {
