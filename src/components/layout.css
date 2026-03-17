@@ -14,6 +14,7 @@ body,
   font-family: Arial, sans-serif;
   background-color: #08111a;
   color: #f1f5f9;
+  overflow: hidden;
 }
 
 html {
@@ -994,6 +995,9 @@ html {
 .login-page {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: var(--app-height);
+  min-height: var(--app-height);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -1085,39 +1089,55 @@ html {
 /* RESPONSIVE */
 
 @media (max-width: 768px) {
-  .whatsapp-layout {
-    display: block;
-    min-height: 100dvh;
-    height: auto;
-    overflow: hidden;
-  }
+.whatsapp-layout {
+  display: block;
+  width: 100vw;
+  height: var(--app-height);
+  min-height: 0;
+  overflow: hidden;
+  background: #0b141a;
+}
 
   .leftbar {
     display: none;
   }
 
-  .sidebar {
-    width: 100%;
-    min-height: 100dvh;
-    max-height: none;
-    border-right: none;
-    border-bottom: none;
-    padding: 18px 16px;
-    overflow-y: auto;
-    background: linear-gradient(180deg, #08111a 0%, #0b141a 100%);
-  }
+.sidebar {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: var(--app-height);
+  min-height: 0;
+  max-height: var(--app-height);
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #08111a 0%, #0b141a 100%);
+}
 
-  .sidebar-top {
-    padding: 0 0 14px 0;
-  }
+.sidebar-top {
+  position: relative;
+  top: auto;
+  z-index: 20;
+  background: linear-gradient(180deg, #08111a 0%, #0b141a 100%);
+  padding: calc(12px + var(--vv-top)) 16px 14px 16px;
+  flex-shrink: 0;
+}
 
-  .mobile-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
+.sidebar-top::after {
+  display: none;
+}
+
+.mobile-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
 
   .mobile-topbar .sidebar-title {
     margin: 0;
@@ -1244,11 +1264,17 @@ html {
     margin-bottom: 20px;
   }
 
-  .chat-list {
-    gap: 0;
-    margin-top: 14px;
-    margin-right: 0;
-  }
+.chat-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  gap: 0;
+  margin: 0;
+  padding: 0 16px 12px 16px;
+}
 
   .chat-item {
     padding: 14px 0;

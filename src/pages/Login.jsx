@@ -10,7 +10,41 @@ function Login() {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    const root = document.documentElement;
+
+    function updateViewportVars() {
+      const vv = window.visualViewport;
+
+      if (vv) {
+        root.style.setProperty("--app-height", `${vv.height}px`);
+        root.style.setProperty("--vv-top", `${vv.offsetTop}px`);
+      } else {
+        root.style.setProperty("--app-height", `${window.innerHeight}px`);
+        root.style.setProperty("--vv-top", "0px");
+      }
+    }
+
+    updateViewportVars();
+
+    window.addEventListener("resize", updateViewportVars);
+    window.addEventListener("orientationchange", updateViewportVars);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", updateViewportVars);
+      window.visualViewport.addEventListener("scroll", updateViewportVars);
+    }
+
+    if (!video) {
+      return () => {
+        window.removeEventListener("resize", updateViewportVars);
+        window.removeEventListener("orientationchange", updateViewportVars);
+
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener("resize", updateViewportVars);
+          window.visualViewport.removeEventListener("scroll", updateViewportVars);
+        }
+      };
+    }
 
     video.muted = true;
     video.defaultMuted = true;
@@ -43,6 +77,13 @@ function Login() {
     return () => {
       video.removeEventListener("canplay", onCanPlay);
       window.removeEventListener("touchstart", onFirstTouch);
+      window.removeEventListener("resize", updateViewportVars);
+      window.removeEventListener("orientationchange", updateViewportVars);
+
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", updateViewportVars);
+        window.visualViewport.removeEventListener("scroll", updateViewportVars);
+      }
     };
   }, []);
 
