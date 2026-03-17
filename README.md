@@ -1,16 +1,92 @@
-# React + Vite
+# 🌌 AstroChat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AstroChat es una aplicación web desarrollada en React que simula un chat interactivo con distintos objetos astronómicos, como supernovas y remanentes de supernova.  
 
-Currently, two official plugins are available:
+El objetivo del proyecto fue construir una interfaz moderna tipo mensajería (inspirada en WhatsApp), aplicando conceptos de frontend como estados, contexto, enrutamiento y diseño responsivo.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Demo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+🔗 https://astrochat-mu.vercel.app  
+*(reemplazar si tu link es otro)*
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🧠 Funcionalidades
+
+- 🔐 Login con persistencia en localStorage  
+- 💬 Chat interactivo con objetos astronómicos  
+- ⭐ Sistema de favoritos  
+- 🔎 Búsqueda de objetos en tiempo real  
+- ⚙️ Página de ajustes  
+- 📱 Diseño completamente responsivo (320px → desktop)  
+- 🌌 Fondo dinámico estilo espacial en los chats  
+- 💡 Preguntas rápidas para facilitar la interacción  
+
+---
+
+## 🛠️ Tecnologías utilizadas
+
+- React  
+- React Router DOM  
+- Context API  
+- CSS (custom, sin frameworks)  
+- Vite  
+- Vercel (deploy)  
+
+---
+
+## 🧩 Estructura del proyecto
+
+- `src/components/` → componentes reutilizables  
+- `src/pages/` → páginas principales (Home, Chat, Favorites, Settings, Login)  
+- `src/context/` → manejo de estado global  
+- `public/` → imágenes y recursos estáticos  
+
+---
+
+## 🔁 Enrutamiento
+
+La navegación se implementa con `react-router-dom`, incluyendo:
+
+- rutas dinámicas (`/chat/:id`)  
+- parámetros de búsqueda (`useSearchParams`)  
+- navegación programática (`useNavigate`)  
+
+---
+
+## 🧪 Conceptos aplicados
+
+- Manejo de estado con `useState`  
+- Estado global con `Context API`  
+- Componentización  
+- Diseño responsive  
+- Manejo de formularios  
+- Separación de responsabilidades  
+
+---
+
+## ⚠️ Dificultades encontradas
+
+- Manejo del viewport en mobile (especialmente en iOS)  
+- Control del scroll en listas largas  
+- Adaptación del layout tipo aplicación (sidebar + chat)  
+- Ajuste fino del diseño responsive  
+- Sincronización de estados entre componentes  
+
+---
+
+## 📌 Mejoras futuras
+
+- Persistencia real de mensajes (base de datos)  
+- Integración con una API  
+- Notificaciones  
+- Modo claro/oscuro  
+- Mejora de animaciones  
+
+---
+
+## 👩‍💻 Autor
+
+Catalina Rodríguez Buss
