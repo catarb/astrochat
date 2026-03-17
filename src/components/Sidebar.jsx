@@ -72,30 +72,32 @@ function Sidebar() {
 
   return (
     <div className="sidebar">
-      <div className="mobile-topbar">
-        <div className="mobile-topbar-left">
-          <img
-            src={avatar || "https://i.pravatar.cc/150?img=12"}
-            alt={user || "Usuario"}
-            className="mobile-user-avatar"
-          />
-          <h1 className="sidebar-title">AstroChat 🌌</h1>
+      <div className="sidebar-top">
+        <div className="mobile-topbar">
+          <div className="mobile-topbar-left">
+            <img
+              src={avatar || "https://i.pravatar.cc/150?img=12"}
+              alt={user || "Usuario"}
+              className="mobile-user-avatar"
+            />
+            <h1 className="sidebar-title">AstroChat 🌌</h1>
+          </div>
+
+          <button className="logout-mobile-button" onClick={handleLogout}>
+            ⎋ Salir
+          </button>
         </div>
 
-        <button className="logout-mobile-button" onClick={handleLogout}>
-          ⎋ Salir
-        </button>
+        <h1 className="sidebar-title desktop-title">AstroChat 🌌</h1>
+
+        <input
+          type="text"
+          placeholder="Buscar objeto..."
+          value={search}
+          onChange={handleSearch}
+          className="search-input"
+        />
       </div>
-
-      <h1 className="sidebar-title desktop-title">AstroChat 🌌</h1>
-
-      <input
-        type="text"
-        placeholder="Buscar objeto..."
-        value={search}
-        onChange={handleSearch}
-        className="search-input"
-      />
 
       <div className="chat-list">
         {filteredObjects.map((obj) => {

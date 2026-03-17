@@ -14,7 +14,6 @@ body,
   font-family: Arial, sans-serif;
   background-color: #08111a;
   color: #f1f5f9;
-  overflow: hidden;
 }
 
 html {
@@ -30,7 +29,8 @@ html {
 
 .whatsapp-layout {
   display: flex;
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
   width: 100%;
   background-color: #0b141a;
   overflow: hidden;
@@ -50,13 +50,41 @@ html {
 
 .sidebar {
   width: 320px;
+  height: 100dvh;
+  min-height: 0;
   background: #111b21;
   border-right: 1px solid #2a3942;
-  padding: 20px;
-  overflow-y: auto;
+  padding: 20px 0 20px 20px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  flex-shrink: 0;
+}
+
+.sidebar-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #111b21;
+  padding: 0 10px 14px 0;
+  flex-shrink: 0;
+}
+
+.sidebar-top::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+  height: 18px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(17, 27, 33, 0.95) 0%,
+    rgba(17, 27, 33, 0.7) 45%,
+    rgba(17, 27, 33, 0) 100%
+  );
 }
 
 .sidebar-title {
@@ -122,6 +150,12 @@ html {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0;
+  margin-right: -2px;
 }
 
 .chat-item {
@@ -578,7 +612,9 @@ html {
 
 .leftbar {
   width: 70px;
-  background: #0f171d;
+  height: 100dvh;
+  min-height: 0;
+  background: linear-gradient(180deg, #0f171d 0%, #08111a 100%);
   border-right: 1px solid #2a3942;
   display: flex;
   flex-direction: column;
@@ -601,14 +637,19 @@ html {
   color: #94a3b8;
   font-size: 18px;
   line-height: 1;
-  transition: background 0.2s ease, transform 0.15s ease;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
   border: none;
   cursor: pointer;
+  position: relative;
 }
 
 .leftbar-btn:hover {
-  background-color: #202c33;
-  transform: scale(1.05);
+  background: radial-gradient(
+    circle at center,
+    rgba(59, 130, 246, 0.25),
+    transparent 70%
+  );
+  transform: scale(1.08);
 }
 
 .leftbar-btn.active {
@@ -616,9 +657,26 @@ html {
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.35);
 }
 
+.leftbar-btn.active::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  width: 4px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 0 4px 4px 0;
+}
+
 .leftbar-bottom {
   margin-top: auto;
   padding-bottom: 12px;
+}
+
+.leftbar-divider {
+  width: 30px;
+  height: 1px;
+  background: #2a3942;
+  margin: 10px 0;
 }
 
 .user-avatar-wrapper {
@@ -633,7 +691,9 @@ html {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #3b82f6;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.35);
+  box-shadow:
+    0 0 12px rgba(59, 130, 246, 0.45),
+    0 0 24px rgba(59, 130, 246, 0.2);
 }
 
 /* ANIMACIONES DEL FONDO */
@@ -756,8 +816,6 @@ html {
   transform: translateY(-1px);
 }
 
-/* MENU DE OPCIONES DEL CHAT */
-
 .chat-menu-wrapper {
   position: relative;
 }
@@ -815,12 +873,12 @@ html {
   left: 56px;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #111b21;
+  background: #0f171d;
   color: #e2e8f0;
   border: 1px solid #2a3942;
-  border-radius: 10px;
-  padding: 6px 10px;
-  font-size: 12px;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 11px;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
@@ -870,22 +928,65 @@ html {
 
 /* SCROLLBARS */
 
+/* Global */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f171d;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a3942;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b4b56;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+/* Lista de chats estilo WhatsApp */
+.chat-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+.chat-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Mensajes */
+.messages-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.messages-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+}
+
+.messages-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* LOGIN */
@@ -1004,6 +1105,10 @@ html {
     padding: 18px 16px;
     overflow-y: auto;
     background: linear-gradient(180deg, #08111a 0%, #0b141a 100%);
+  }
+
+  .sidebar-top {
+    padding: 0 0 14px 0;
   }
 
   .mobile-topbar {
@@ -1142,6 +1247,7 @@ html {
   .chat-list {
     gap: 0;
     margin-top: 14px;
+    margin-right: 0;
   }
 
   .chat-item {

@@ -26,6 +26,7 @@ function App() {
         <Route path="favorites" element={<Favorites />} />
         <Route path="objects" element={<Objects />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="*" element={<Home />} />
       </Route>
     </Routes>
   );

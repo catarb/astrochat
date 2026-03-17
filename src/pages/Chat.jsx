@@ -1,4 +1,8 @@
-import { useParams, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { useContext, useMemo, useState, useEffect } from "react";
 import { AstroChatContext } from "../context/AstroChatContext";
 import MessageList from "../components/MessageList";
@@ -16,10 +20,13 @@ import {
 function Chat() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialSearch = searchParams.get("search") || "";
 
   const [showProfile, setShowProfile] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [showSearch, setShowSearch] = useState(!!initialSearch);
+  const [searchText, setSearchText] = useState(initialSearch);
   const [showMenu, setShowMenu] = useState(false);
 
   const {
@@ -175,8 +182,14 @@ function Chat() {
               className="header-icon-button"
               aria-label="Buscar"
               onClick={() => {
-                setShowSearch((prev) => !prev);
-                setSearchText("");
+                const nextShowSearch = !showSearch;
+                setShowSearch(nextShowSearch);
+
+                if (!nextShowSearch) {
+                  setSearchText("");
+                  setSearchParams({});
+                }
+
                 setShowMenu(false);
               }}
             >
@@ -245,7 +258,16 @@ function Chat() {
               className="chat-search-input"
               placeholder="Buscar en la conversación..."
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchText(value);
+
+                if (value.trim()) {
+                  setSearchParams({ search: value });
+                } else {
+                  setSearchParams({});
+                }
+              }}
             />
           </div>
         )}

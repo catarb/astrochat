@@ -1,7 +1,11 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AstroChatContext } from "../context/AstroChatContext";
 
 function LeftBar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { objects } = useContext(AstroChatContext);
 
   const isChatsActive =
     location.pathname === "/" || location.pathname.startsWith("/chat/");
@@ -13,6 +17,13 @@ function LeftBar() {
     localStorage.removeItem("astrochat_user");
     localStorage.removeItem("astrochat_avatar");
     window.location.href = "/";
+  }
+
+  function handleRandomObject() {
+    if (!objects || objects.length === 0) return;
+
+    const randomObject = objects[Math.floor(Math.random() * objects.length)];
+    navigate(`/chat/${randomObject.id}`);
   }
 
   return (
@@ -60,6 +71,33 @@ function LeftBar() {
           🔭
         </NavLink>
         <span className="leftbar-tooltip">Objetos</span>
+      </div>
+
+      <div className="leftbar-tooltip-wrapper">
+        <button
+          type="button"
+          className="leftbar-btn"
+          onClick={handleRandomObject}
+          aria-label="Objeto aleatorio"
+        >
+          🎲
+        </button>
+        <span className="leftbar-tooltip">Objeto aleatorio</span>
+      </div>
+
+      <div className="leftbar-divider" />
+
+      <div className="leftbar-tooltip-wrapper">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            isActive ? "leftbar-btn active" : "leftbar-btn"
+          }
+          aria-label="Configuración"
+        >
+          ⚙️
+        </NavLink>
+        <span className="leftbar-tooltip">Configuración</span>
       </div>
 
       <div className="leftbar-bottom">

@@ -37,13 +37,112 @@ export function AstroChatProvider({ children }) {
         "Una de las supernovas más brillantes registradas por la humanidad, visible a simple vista en el año 1006.",
       image: "/sn1006.jpg",
     },
+    {
+      id: "crabNebula",
+      name: "Crab Nebula",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "1054",
+      distance: "6,500 años luz",
+      description:
+        "Remanente histórico asociado a la supernova observada en el año 1054, famoso por su púlsar central.",
+      image: "/Crab_Nebula.jpg",
+    },
+    {
+      id: "tycho",
+      name: "Tycho",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "1572",
+      distance: "8,000 años luz",
+      description:
+        "Remanente de la supernova observada por Tycho Brahe, fundamental para la historia de la astronomía.",
+      image: "/Tychos-Supernova-Chandra.webp",
+    },
+    {
+      id: "kepler",
+      name: "Kepler",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "1604",
+      distance: "20,000 años luz",
+      description:
+        "Remanente asociado a la última supernova observada a simple vista en la Vía Láctea.",
+      image: "/kepler.jpg",
+    },
+    {
+      id: "vela",
+      name: "Vela",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "hace ~11,000 años",
+      distance: "800 años luz",
+      description:
+        "Uno de los remanentes de supernova más cercanos a la Tierra, brillante en rayos X.",
+      image: "/vela.webp",
+    },
+    {
+      id: "rcw86",
+      name: "RCW 86",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "185",
+      distance: "8,200 años luz",
+      description:
+        "Posible remanente de la supernova registrada por astrónomos chinos en el año 185.",
+      image: "/rcw86.jpg",
+    },
+    {
+      id: "puppisA",
+      name: "Puppis A",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "hace ~4,000 años",
+      distance: "7,000 años luz",
+      description:
+        "Remanente galáctico joven con estructura compleja y estudiado en múltiples longitudes de onda.",
+      image: "/puppisA.jpg",
+    },
+    {
+      id: "ic443",
+      name: "IC 443",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "hace ~3,000-30,000 años",
+      distance: "5,000 años luz",
+      description:
+        "Remanente que interactúa con nubes moleculares, muy interesante para estudios de choques.",
+      image: "/ic443.jpg",
+    },
+    {
+      id: "w49b",
+      name: "W49B",
+      type: "Supernova Remnant",
+      galaxy: "Milky Way",
+      year: "hace ~1,000 años",
+      distance: "26,000 años luz",
+      description:
+        "Remanente brillante y peculiar, posiblemente originado por una explosión altamente asimétrica.",
+      image: "/w49b.jpg",
+    },
+    {
+      id: "n63a",
+      name: "N63A",
+      type: "Supernova Remnant",
+      galaxy: "LMC",
+      year: "joven",
+      distance: "160,000 años luz",
+      description:
+        "Remanente ubicado en la región H II N63, inmerso en un entorno muy rico en gas interestelar.",
+      image: "/n63a.jpg",
+    },
   ]);
 
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem("astrochat-favorites");
     return savedFavorites
       ? JSON.parse(savedFavorites)
-      : ["sn1987a", "cassiopeiaA"];
+      : ["sn1987a", "cassiopeiaA", "n63a"];
   });
 
   const initialMessages = {
@@ -61,7 +160,76 @@ export function AstroChatProvider({ children }) {
         time: "17:15",
       },
     ],
-    sn1006: [],
+    sn1006: [
+      {
+        sender: "bot",
+        text: "Fui una de las supernovas más brillantes observadas por la humanidad ✨",
+        time: "12:08",
+      },
+    ],
+    crabNebula: [
+      {
+        sender: "bot",
+        text: "Mi púlsar central es uno de mis rasgos más famosos 🦀",
+        time: "11:34",
+      },
+    ],
+    tycho: [
+      {
+        sender: "bot",
+        text: "Estoy asociado a la supernova observada por Tycho Brahe 🔭",
+        time: "10:52",
+      },
+    ],
+    kepler: [
+      {
+        sender: "bot",
+        text: "Soy la última supernova observada a simple vista en la Vía Láctea 🌌",
+        time: "09:47",
+      },
+    ],
+    vela: [
+      {
+        sender: "bot",
+        text: "Soy uno de los remanentes de supernova más cercanos a la Tierra 💫",
+        time: "08:40",
+      },
+    ],
+    rcw86: [
+      {
+        sender: "bot",
+        text: "Podría estar vinculado a una supernova registrada en el año 185 📜",
+        time: "16:19",
+      },
+    ],
+    puppisA: [
+      {
+        sender: "bot",
+        text: "Tengo una morfología compleja y soy muy interesante en rayos X ⚡",
+        time: "15:03",
+      },
+    ],
+    ic443: [
+      {
+        sender: "bot",
+        text: "Interactúo con nubes moleculares, lo que me hace muy especial ☁️",
+        time: "14:26",
+      },
+    ],
+    w49b: [
+      {
+        sender: "bot",
+        text: "Mi estructura sugiere una explosión poco común 🚀",
+        time: "13:11",
+      },
+    ],
+    n63a: [
+      {
+        sender: "bot",
+        text: "Estoy inmerso en la región H II N63 en la Nube Mayor de Magallanes 🌠",
+        time: "19:04",
+      },
+    ],
   };
 
   const [messages, setMessages] = useState(() => {
@@ -145,6 +313,114 @@ export function AstroChatProvider({ children }) {
           "Mi brillo fue tan intenso que la gente podía verme con enorme claridad.",
           "Soy un objeto histórico muy importante para la astronomía.",
           "Mi remanente todavía se estudia en distintas longitudes de onda.",
+        ],
+      },
+      crabNebula: {
+        intro: "Soy Crab Nebula, un remanente de supernova muy famoso.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 6.500 años luz.",
+        year: "Estoy asociado a la supernova observada en 1054.",
+        type: "Soy un remanente de supernova con un púlsar central.",
+        extra: [
+          "Mi púlsar central es uno de los más conocidos de la astronomía.",
+          "Soy un objeto clásico para estudiar física de altas energías.",
+          "Tengo una estructura filamentaria muy característica.",
+        ],
+      },
+      tycho: {
+        intro: "Soy Tycho, remanente de la supernova observada en 1572.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 8.000 años luz.",
+        year: "Mi supernova fue observada en 1572.",
+        type: "Soy un remanente de supernova histórica.",
+        extra: [
+          "Estoy ligado al trabajo de Tycho Brahe.",
+          "Soy importante tanto histórica como astrofísicamente.",
+          "Se me estudia mucho para entender remanentes jóvenes.",
+        ],
+      },
+      kepler: {
+        intro: "Soy Kepler, remanente de la supernova observada en 1604.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 20.000 años luz.",
+        year: "Mi explosión fue observada en 1604.",
+        type: "Soy un remanente de supernova histórica muy importante.",
+        extra: [
+          "Fui la última supernova observada a simple vista en nuestra galaxia.",
+          "Tengo un lugar especial en la historia de la astronomía.",
+          "Se me estudia mucho en rayos X y otras longitudes de onda.",
+        ],
+      },
+      vela: {
+        intro: "Soy Vela, un remanente de supernova muy cercano.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 800 años luz.",
+        year: "Me originé hace unos 11.000 años.",
+        type: "Soy un remanente de supernova extenso y cercano.",
+        extra: [
+          "Mi cercanía me hace ideal para muchos estudios detallados.",
+          "Soy brillante en rayos X.",
+          "Formo parte de una región muy interesante del cielo austral.",
+        ],
+      },
+      rcw86: {
+        intro: "Soy RCW 86, un remanente posiblemente asociado a la supernova del año 185.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 8.200 años luz.",
+        year: "Podría estar vinculado a una observación histórica del año 185.",
+        type: "Soy un remanente de supernova galáctico.",
+        extra: [
+          "Tengo interés histórico y físico al mismo tiempo.",
+          "Soy útil para estudiar choques y aceleración de partículas.",
+          "Mi morfología es muy atractiva en distintas bandas.",
+        ],
+      },
+      puppisA: {
+        intro: "Soy Puppis A, un remanente de supernova joven de la Vía Láctea.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 7.000 años luz.",
+        year: "Me originé hace unos 4.000 años.",
+        type: "Soy un remanente de supernova joven.",
+        extra: [
+          "Tengo una estructura compleja muy estudiada.",
+          "Soy interesante en radio y en rayos X.",
+          "Aporto información valiosa sobre la evolución de remanentes jóvenes.",
+        ],
+      },
+      ic443: {
+        intro: "Soy IC 443, un remanente de supernova que interactúa con nubes moleculares.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 5.000 años luz.",
+        year: "Mi edad estimada está entre unos pocos miles y decenas de miles de años.",
+        type: "Soy un remanente de supernova en interacción con el medio interestelar.",
+        extra: [
+          "Soy un caso muy interesante para estudiar choques con nubes.",
+          "Mi estructura refleja una interacción compleja con el entorno.",
+          "Se me observa mucho en varias longitudes de onda.",
+        ],
+      },
+      w49b: {
+        intro: "Soy W49B, un remanente de supernova brillante y peculiar.",
+        galaxy: "Estoy en la Vía Láctea.",
+        distance: "Estoy a unos 26.000 años luz.",
+        year: "Se estima que me originé hace alrededor de 1.000 años.",
+        type: "Soy un remanente de supernova con rasgos poco comunes.",
+        extra: [
+          "Podría haberme formado en una explosión muy asimétrica.",
+          "Soy muy interesante para estudios de altas energías.",
+          "Mi morfología me hace destacar frente a otros remanentes.",
+        ],
+      },
+      n63a: {
+        intro: "Soy N63A, un remanente de supernova en la Nube Mayor de Magallanes.",
+        galaxy: "Estoy en la Gran Nube de Magallanes.",
+        distance: "Estoy a unos 160.000 años luz.",
+        year: "Soy un remanente relativamente joven.",
+        type: "Soy un remanente de supernova inmerso en una región H II.",
+        extra: [
+          "Estoy asociado a un entorno interestelar muy rico y complejo.",
+          "Soy muy interesante para estudiar interacción entre remanente y medio circundante.",
+          "Mi ubicación en N63 me vuelve un objeto muy atractivo para la astrofísica.",
         ],
       },
     };
