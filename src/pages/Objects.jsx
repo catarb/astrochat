@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { AstroChatContext } from "../context/AstroChatContext";
 import { NavLink } from "react-router-dom";
+import { getImageSource, handleImageError } from "../utils/image";
 
 function Objects() {
   const { objects } = useContext(AstroChatContext);
@@ -20,8 +21,11 @@ function Objects() {
       </p>
 
       <div style={{ display: "grid", gap: "16px", maxWidth: "700px" }}>
-        {objects.map((obj) => (
-          <NavLink
+        {objects.map((obj) => {
+          const imageSrc = getImageSource(obj);
+
+          return (
+            <NavLink
             key={obj.id}
             to={`/chat/${obj.id}`}
             style={{ textDecoration: "none", color: "inherit" }}
@@ -38,8 +42,8 @@ function Objects() {
               }}
             >
               <img
-                src={obj.image}
-                alt={obj.name}
+                src={imageSrc}
+                alt={obj.name || obj.astro?.name || "Astro"}
                 style={{
                   width: "58px",
                   height: "58px",
@@ -47,6 +51,7 @@ function Objects() {
                   objectFit: "cover",
                   border: "2px solid #3b82f6",
                 }}
+                onError={handleImageError}
               />
               <div>
                 <h3 style={{ margin: 0, color: "#f8fafc" }}>{obj.name}</h3>
@@ -55,8 +60,9 @@ function Objects() {
                 </p>
               </div>
             </div>
-          </NavLink>
-        ))}
+            </NavLink>
+          );
+        })}
       </div>
     </div>
   );

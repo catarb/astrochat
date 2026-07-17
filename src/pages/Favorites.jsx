@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { AstroChatContext } from "../context/AstroChatContext";
 import { NavLink } from "react-router-dom";
+import { getImageSource, handleImageError } from "../utils/image";
 
 function Favorites() {
   const { objects, favorites } = useContext(AstroChatContext);
@@ -25,8 +26,11 @@ function Favorites() {
         <p style={{ color: "#94a3b8" }}>Todavía no marcaste favoritos.</p>
       ) : (
         <div style={{ display: "grid", gap: "16px", maxWidth: "700px" }}>
-          {favoriteObjects.map((obj) => (
-            <NavLink
+          {favoriteObjects.map((obj) => {
+            const imageSrc = getImageSource(obj);
+
+            return (
+              <NavLink
               key={obj.id}
               to={`/chat/${obj.id}`}
               style={{ textDecoration: "none", color: "inherit" }}
@@ -43,8 +47,8 @@ function Favorites() {
                 }}
               >
                 <img
-                  src={obj.image}
-                  alt={obj.name}
+                  src={imageSrc}
+                  alt={obj.name || obj.astro?.name || "Astro"}
                   style={{
                     width: "58px",
                     height: "58px",
@@ -52,10 +56,7 @@ function Favorites() {
                     objectFit: "cover",
                     border: "2px solid #3b82f6",
                   }}
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/150/1e293b/ffffff?text=Astro";
-                  }}
+                  onError={handleImageError}
                 />
                 <div>
                   <h3 style={{ margin: 0, color: "#f8fafc" }}>{obj.name}</h3>
@@ -64,8 +65,9 @@ function Favorites() {
                   </p>
                 </div>
               </div>
-            </NavLink>
-          ))}
+              </NavLink>
+            );
+          })}
         </div>
       )}
     </div>

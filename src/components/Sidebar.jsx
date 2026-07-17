@@ -1,25 +1,26 @@
 import { useContext } from "react";
 import { AstroChatContext } from "../context/AstroChatContext";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/auth-context";
+import { getImageSource, handleImageError } from "../utils/image";
 
 function Sidebar() {
   const { objects, messages, favorites, unreadCounts } =
     useContext(AstroChatContext);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const userImageSrc = getImageSource(user, "/astro-icon.jpg");
 
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") || "";
-
-  const user = localStorage.getItem("astrochat_user");
-  const avatar = localStorage.getItem("astrochat_avatar");
 
   function handleSearch(e) {
     setSearchParams({ search: e.target.value });
   }
 
   function handleLogout() {
-    localStorage.removeItem("astrochat_user");
-    localStorage.removeItem("astrochat_avatar");
-    window.location.href = "/";
+    logout();
+    navigate("/login", { replace: true });
   }
 
   const filteredObjects = objects
@@ -76,9 +77,10 @@ function Sidebar() {
         <div className="mobile-topbar">
           <div className="mobile-topbar-left">
             <img
-              src={avatar || "https://i.pravatar.cc/150?img=12"}
-              alt={user || "Usuario"}
+              src={userImageSrc}
+              alt={user?.name || "Usuario"}
               className="mobile-user-avatar"
+              onError={handleImageError}
             />
             <h1 className="sidebar-title">AstroChat 🌌</h1>
           </div>
@@ -103,6 +105,7 @@ function Sidebar() {
         {filteredObjects.map((obj) => {
           const unreadCount = getUnreadCount(obj.id);
           const isFavorite = favorites.includes(obj.id);
+          const imageSrc = getImageSource(obj);
 
           return (
             <NavLink
@@ -113,13 +116,10 @@ function Sidebar() {
               }
             >
               <img
-                src={obj.image}
-                alt={obj.name}
+                src={imageSrc}
+                alt={obj.name || obj.astro?.name || "Astro"}
                 className="astro-avatar"
-                onError={(e) => {
-                  e.target.src =
-                    "https://via.placeholder.com/150/1e293b/ffffff?text=Astro";
-                }}
+                onError={handleImageError}
               />
 
               <div className="chat-info">

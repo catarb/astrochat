@@ -1088,6 +1088,58 @@ html {
   transform: scale(0.98);
 }
 
+.login-form button:disabled,
+.login-form input:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.auth-message {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.auth-error {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.auth-success {
+  color: #bbf7d0;
+  background: rgba(37, 211, 102, 0.12);
+  border: 1px solid rgba(37, 211, 102, 0.28);
+}
+
+.auth-switch {
+  margin: 0;
+  color: #cbd5e1;
+  text-align: center;
+  font-size: 13px;
+}
+
+.auth-switch a {
+  color: #25d366;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.auth-loading {
+  width: 100%;
+  height: var(--app-height);
+  display: grid;
+  place-items: center;
+  background: #08111a;
+  color: #cbd5e1;
+}
+
 /* RESPONSIVE */
 
 @media (max-width: 768px) {

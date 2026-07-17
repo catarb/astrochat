@@ -1,22 +1,22 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AstroChatContext } from "../context/AstroChatContext";
+import { useAuth } from "../context/auth-context";
+import { getImageSource, handleImageError } from "../utils/image";
 
 function LeftBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { objects } = useContext(AstroChatContext);
+  const { user, logout } = useAuth();
+  const userImageSrc = getImageSource(user, "/astro-icon.jpg");
 
   const isChatsActive =
     location.pathname === "/" || location.pathname.startsWith("/chat/");
 
-  const user = localStorage.getItem("astrochat_user");
-  const avatar = localStorage.getItem("astrochat_avatar");
-
   function handleLogout() {
-    localStorage.removeItem("astrochat_user");
-    localStorage.removeItem("astrochat_avatar");
-    window.location.href = "/";
+    logout();
+    navigate("/login", { replace: true });
   }
 
   function handleRandomObject() {
@@ -30,9 +30,10 @@ function LeftBar() {
     <div className="leftbar">
       <div className="user-avatar-wrapper">
         <img
-          src={avatar || "https://i.pravatar.cc/150?img=12"}
-          alt={user || "Usuario"}
+          src={userImageSrc}
+          alt={user?.name || "Usuario"}
           className="user-avatar"
+          onError={handleImageError}
         />
       </div>
 

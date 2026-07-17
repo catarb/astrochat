@@ -1,9 +1,13 @@
-function Settings() {
-  const user = localStorage.getItem("astrochat_user") || "invitado";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/auth-context";
 
-  function logout() {
-    localStorage.removeItem("astrochat_user");
-    window.location.reload();
+function Settings() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
   }
 
   return (
@@ -40,18 +44,13 @@ function Settings() {
             Cuenta
           </h2>
 
-          <p
-            style={{
-              margin: 0,
-              color: "#cbd5e1",
-            }}
-          >
-            Usuario actual: <strong>{user}</strong>
+          <p style={{ margin: 0, color: "#cbd5e1" }}>
+            Usuario actual: <strong>{user?.name || user?.email}</strong>
           </p>
         </div>
 
         <button
-          onClick={logout}
+          onClick={handleLogout}
           style={{
             width: "fit-content",
             padding: "12px 18px",

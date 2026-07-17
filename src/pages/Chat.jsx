@@ -8,6 +8,7 @@ import { AstroChatContext } from "../context/AstroChatContext";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
 import QuickQuestions from "../components/QuickQuestions";
+import { getImageSource, handleImageError } from "../utils/image";
 
 import {
   ArrowLeft,
@@ -40,6 +41,7 @@ function Chat() {
   } = useContext(AstroChatContext);
 
   const currentObject = objects.find((obj) => obj.id === id);
+  const currentImageSrc = getImageSource(currentObject);
   const currentMessages = messages[id] || [];
   const isFavorite = favorites.includes(id);
 
@@ -132,13 +134,10 @@ function Chat() {
           </button>
 
           <img
-            src={currentObject.image}
-            alt={currentObject.name}
+            src={currentImageSrc}
+            alt={currentObject.name || currentObject.astro?.name || "Astro"}
             className="chat-avatar"
-            onError={(e) => {
-              e.target.src =
-                "https://via.placeholder.com/150/1e293b/ffffff?text=Astro";
-            }}
+            onError={handleImageError}
           />
 
           <div className="chat-header-info">
@@ -275,13 +274,10 @@ function Chat() {
         {showProfile && (
           <div className="object-profile">
             <img
-              src={currentObject.image}
-              alt={currentObject.name}
+              src={currentImageSrc}
+              alt={currentObject.name || currentObject.astro?.name || "Astro"}
               className="object-profile-image"
-              onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/150/1e293b/ffffff?text=Astro";
-              }}
+              onError={handleImageError}
             />
 
             <h3>{currentObject.name}</h3>
