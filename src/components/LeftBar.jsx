@@ -11,7 +11,7 @@ import {
 function LeftBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { objects } = useContext(AstroChatContext);
+  const { objects, createConversation } = useContext(AstroChatContext);
   const { user, logout } = useAuth();
   const userImageSrc = getImageSource(user, "/astro-icon.jpg");
 
@@ -23,11 +23,17 @@ function LeftBar() {
     navigate("/login", { replace: true });
   }
 
-  function handleRandomObject() {
+  async function handleRandomObject() {
     if (!Array.isArray(objects) || objects.length === 0) return;
 
     const randomObject = objects[Math.floor(Math.random() * objects.length)];
-    navigate(`/chat/${randomObject.id}`);
+
+    try {
+      const conversation = await createConversation(randomObject);
+      navigate(`/chat/${conversation.id}`);
+    } catch {
+      // El contexto conserva el error para mostrarlo en la lista de chats.
+    }
   }
 
   return (

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AstroChatContext } from "../context/astro-chat-context";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   getImageFallbackSource,
   getImageSource,
@@ -8,9 +8,27 @@ import {
 } from "../utils/image";
 
 function Favorites() {
-  const { objects, favorites, loadingAstros, astrosError } =
+  const {
+    objects,
+    favorites,
+    loadingAstros,
+    astrosError,
+    createConversation,
+  } =
     useContext(AstroChatContext);
+  const navigate = useNavigate();
   const safeObjects = Array.isArray(objects) ? objects : [];
+
+  async function handleStartConversation(event, astro) {
+    event.preventDefault();
+
+    try {
+      const conversation = await createConversation(astro);
+      navigate(`/chat/${conversation.id}`);
+    } catch {
+      // El contexto conserva el error para mostrarlo en la lista de chats.
+    }
+  }
 
   const favoriteObjects = safeObjects.filter((obj) =>
     favorites.includes(obj.demoId || obj.id),
@@ -44,7 +62,8 @@ function Favorites() {
             return (
               <NavLink
               key={obj.id}
-              to={`/chat/${obj.id}`}
+              to="/favorites"
+              onClick={(event) => handleStartConversation(event, obj)}
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <div

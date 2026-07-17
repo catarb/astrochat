@@ -37,21 +37,28 @@ function Chat() {
   const [showMenu, setShowMenu] = useState(false);
 
   const {
-    objects,
+    conversations,
+    activeConversation,
+    activeConversationId,
+    selectConversation,
+    deleteConversation,
     messages,
     favorites,
     toggleFavorite,
     sendMessage,
-    clearChat,
     resetChat,
-    loadingAstros,
-    astrosError,
+    loadingConversations,
+    conversationsError,
   } = useContext(AstroChatContext);
 
-  const safeObjects = Array.isArray(objects) ? objects : [];
-  const currentObject = safeObjects.find((obj) => obj.id === id);
+  const safeConversations = Array.isArray(conversations) ? conversations : [];
+  const currentConversation =
+    activeConversation?.id === id
+      ? activeConversation
+      : safeConversations.find((conversation) => conversation.id === id);
+  const currentObject = currentConversation?.astro;
   const currentImageSrc = getImageSource(currentObject);
-  const chatDataId = currentObject?.demoId || id;
+  const chatDataId = currentObject?.demoId || currentObject?.id || id;
   const currentMessages = messages[chatDataId] || EMPTY_MESSAGES;
   const isFavorite = favorites.includes(chatDataId);
 
@@ -99,12 +106,18 @@ function Chat() {
     };
   }, []);
 
-  if (loadingAstros || astrosError || !currentObject) {
-    const statusMessage = loadingAstros
-      ? "Cargando astros..."
-      : astrosError
-        ? "No se pudieron cargar los astros"
-        : "Objeto no encontrado.";
+  useEffect(() => {
+    if (currentConversation && activeConversationId !== id) {
+      selectConversation(id);
+    }
+  }, [activeConversationId, currentConversation, id, selectConversation]);
+
+  if (loadingConversations || conversationsError || !currentObject) {
+    const statusMessage = loadingConversations
+      ? "Cargando conversaciones..."
+      : conversationsError
+        ? "No se pudieron cargar las conversaciones."
+        : "Conversación no encontrada.";
 
     return (
       <div className="chat-container">
@@ -137,6 +150,16 @@ function Chat() {
         minute: "2-digit",
       }),
     });
+  }
+
+  async function handleDeleteConversation() {
+    try {
+      await deleteConversation(id);
+      setShowMenu(false);
+      navigate("/", { replace: true });
+    } catch {
+      setShowMenu(false);
+    }
   }
 
   const botTyping = currentMessages.some((msg) => msg.typing);
@@ -242,10 +265,7 @@ function Chat() {
                 <button
                   type="button"
                   className="chat-menu-item"
-                  onClick={() => {
-                    clearChat(chatDataId);
-                    setShowMenu(false);
-                  }}
+                  onClick={handleDeleteConversation}
                 >
                   Borrar conversación
                 </button>

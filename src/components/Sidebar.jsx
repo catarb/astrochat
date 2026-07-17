@@ -10,12 +10,13 @@ import {
 
 function Sidebar() {
   const {
-    objects,
+    conversations,
     messages,
     favorites,
     unreadCounts,
-    loadingAstros,
-    astrosError,
+    loadingConversations,
+    conversationsError,
+    selectConversation,
   } = useContext(AstroChatContext);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -33,12 +34,18 @@ function Sidebar() {
     navigate("/login", { replace: true });
   }
 
-  const safeObjects = Array.isArray(objects) ? objects : [];
-  const filteredObjects = safeObjects
-    .filter((obj) => obj.name.toLowerCase().includes(search.toLowerCase()))
+  const safeConversations = Array.isArray(conversations) ? conversations : [];
+  const filteredConversations = safeConversations
+    .filter((conversation) => {
+      const searchableText = `${conversation.title || ""} ${
+        conversation.astro?.name || ""
+      }`;
+
+      return searchableText.toLowerCase().includes(search.toLowerCase());
+    })
     .sort((a, b) => {
-      const aFav = favorites.includes(a.id);
-      const bFav = favorites.includes(b.id);
+      const aFav = favorites.includes(a.astro?.demoId || a.astro?.id);
+      const bFav = favorites.includes(b.astro?.demoId || b.astro?.id);
 
       if (aFav && !bFav) return -1;
       if (!aFav && bFav) return 1;
@@ -61,7 +68,7 @@ function Sidebar() {
     return lastMessage.text;
   }
 
-  function getLastMessageTime(objectId) {
+  function getLastMessageTime(objectId, lastMessageAt) {
     const chatMessages = messages[objectId] || [];
 
     if (chatMessages.length === 0) {
@@ -71,7 +78,14 @@ function Sidebar() {
         sn1006: "12:08",
       };
 
-      return fallbackTimes[objectId] || "";
+      if (fallbackTimes[objectId]) return fallbackTimes[objectId];
+
+      return lastMessageAt
+        ? new Date(lastMessageAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "";
     }
 
     const lastMessage = chatMessages[chatMessages.length - 1];
@@ -114,47 +128,52 @@ function Sidebar() {
       </div>
 
       <div className="chat-list">
-        {loadingAstros ? (
-          <p className="no-results">Cargando astros...</p>
-        ) : astrosError ? (
-          <p className="no-results">No se pudieron cargar los astros</p>
-        ) : filteredObjects.length === 0 ? (
-          <p className="no-results">No hay astros disponibles.</p>
+        {loadingConversations ? (
+          <p className="no-results">Cargando conversaciones...</p>
+        ) : conversationsError ? (
+          <p className="no-results">No se pudieron cargar las conversaciones.</p>
+        ) : filteredConversations.length === 0 ? (
+          <p className="no-results">No hay conversaciones.</p>
         ) : (
-          filteredObjects.map((obj) => {
-          const unreadCount = getUnreadCount(obj.id);
-          const favoriteId = obj.demoId || obj.id;
+          filteredConversations.map((conversation) => {
+          const astro = conversation.astro || {};
+          const chatDataId = astro.demoId || astro.id;
+          const unreadCount = getUnreadCount(conversation.id);
+          const favoriteId = astro.demoId || astro.id;
           const isFavorite = favorites.includes(favoriteId);
-          const imageSrc = getImageSource(obj);
+          const imageSrc = getImageSource(astro);
 
           return (
             <NavLink
-              key={obj.id}
-              to={`/chat/${obj.id}`}
+              key={conversation.id}
+              to={`/chat/${conversation.id}`}
+              onClick={() => selectConversation(conversation.id)}
               className={({ isActive }) =>
                 isActive ? "chat-item active-chat" : "chat-item"
               }
             >
               <img
                 src={imageSrc}
-                alt={obj.name || obj.astro?.name || "Astro"}
+                alt={astro.name || "Astro"}
                 className="astro-avatar"
-                data-fallback-src={getImageFallbackSource(obj)}
+                data-fallback-src={getImageFallbackSource(astro)}
                 onError={handleImageError}
               />
 
               <div className="chat-info">
                 <div className="chat-top-row">
                   <h4>
-                    {obj.name} {isFavorite && "⭐"}
+                    {conversation.title || astro.name} {isFavorite && "⭐"}
                   </h4>
-                  <span className="chat-time">{getLastMessageTime(obj.id)}</span>
+                  <span className="chat-time">
+                    {getLastMessageTime(chatDataId, conversation.lastMessageAt)}
+                  </span>
                 </div>
 
-                <p className="chat-type">{obj.type}</p>
+                <p className="chat-type">{astro.type}</p>
 
                 <div className="chat-bottom-row">
-                  <p className="chat-preview">{getLastMessageText(obj.id)}</p>
+                  <p className="chat-preview">{getLastMessageText(chatDataId)}</p>
 
                   {unreadCount > 0 && (
                     <span className="unread-badge">{unreadCount}</span>

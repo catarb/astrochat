@@ -7,6 +7,11 @@ import {
 import { useAuth } from "./auth-context";
 import { AstroChatContext } from "./astro-chat-context";
 import { getAstros } from "../services/astro.service";
+import {
+  createConversation as createConversationRequest,
+  deleteConversation as deleteConversationRequest,
+  getConversations,
+} from "../services/conversation.service";
 import { ASTRO_IMAGE_FALLBACK, getImageSource } from "../utils/image";
 
 const DEMO_ASTROS = [
@@ -170,12 +175,39 @@ const normalizeAstro = (astro) => {
   };
 };
 
+const getEntityId = (entity) =>
+  typeof entity === "string" ? entity : entity?._id || entity?.id;
+
+const normalizeConversation = (conversation, astros) => {
+  const conversationAstro = conversation.astro;
+  const astroId = getEntityId(conversationAstro);
+  const loadedAstro = astros.find((astro) => astro.id === astroId);
+  const populatedAstro =
+    conversationAstro && typeof conversationAstro === "object"
+      ? normalizeAstro(conversationAstro)
+      : null;
+
+  return {
+    ...conversation,
+    id: conversation._id || conversation.id,
+    astro: loadedAstro || populatedAstro || (astroId ? { id: astroId } : null),
+  };
+};
+
 export function AstroChatProvider({ children }) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [astros, setAstros] = useState([]);
   const [loadingAstros, setLoadingAstros] = useState(false);
   const [astrosError, setAstrosError] = useState("");
+  const [hasLoadedAstros, setHasLoadedAstros] = useState(false);
   const astroRequestId = useRef(0);
+  const [conversations, setConversations] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(false);
+  const [conversationsError, setConversationsError] = useState("");
+  const [activeConversationId, setActiveConversationId] = useState(null);
+  const conversationRequestId = useRef(0);
+  const conversationCreations = useRef(new Map());
+  const conversationDeletions = useRef(new Map());
 
   const refreshAstros = useCallback(async () => {
     if (!isAuthenticated) return [];
@@ -203,6 +235,7 @@ export function AstroChatProvider({ children }) {
     } finally {
       if (requestId === astroRequestId.current) {
         setLoadingAstros(false);
+        setHasLoadedAstros(true);
       }
     }
   }, [isAuthenticated]);
@@ -215,11 +248,160 @@ export function AstroChatProvider({ children }) {
       setAstros([]);
       setAstrosError("");
       setLoadingAstros(false);
+      setHasLoadedAstros(false);
       return;
     }
 
     refreshAstros();
   }, [authLoading, isAuthenticated, refreshAstros]);
+
+  const refreshConversations = useCallback(async () => {
+    if (!isAuthenticated) return [];
+
+    const requestId = ++conversationRequestId.current;
+    setLoadingConversations(true);
+    setConversationsError("");
+
+    try {
+      const responseConversations = await getConversations();
+      const normalizedConversations = responseConversations.map(
+        (conversation) => normalizeConversation(conversation, astros),
+      );
+
+      if (requestId === conversationRequestId.current) {
+        setConversations(normalizedConversations);
+      }
+
+      return normalizedConversations;
+    } catch (error) {
+      if (requestId === conversationRequestId.current) {
+        setConversations([]);
+        setConversationsError(
+          error.message || "No se pudieron cargar las conversaciones",
+        );
+      }
+
+      return [];
+    } finally {
+      if (requestId === conversationRequestId.current) {
+        setLoadingConversations(false);
+      }
+    }
+  }, [astros, isAuthenticated]);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      conversationRequestId.current += 1;
+      conversationCreations.current.clear();
+      conversationDeletions.current.clear();
+      setConversations([]);
+      setConversationsError("");
+      setLoadingConversations(false);
+      setActiveConversationId(null);
+      return;
+    }
+
+    if (hasLoadedAstros) {
+      refreshConversations();
+    }
+  }, [
+    authLoading,
+    hasLoadedAstros,
+    isAuthenticated,
+    refreshConversations,
+  ]);
+
+  const activeConversation =
+    conversations.find(
+      (conversation) => conversation.id === activeConversationId,
+    ) || null;
+
+  const selectConversation = useCallback((conversationId) => {
+    setActiveConversationId(conversationId || null);
+  }, []);
+
+  const createConversation = useCallback(
+    async (astro) => {
+      const astroId = getEntityId(astro);
+
+      if (!astroId) {
+        throw new Error("No se pudo identificar el astro seleccionado.");
+      }
+
+      const pendingCreation = conversationCreations.current.get(astroId);
+      if (pendingCreation) return pendingCreation;
+
+      setConversationsError("");
+      const creation = createConversationRequest({
+        astro: astroId,
+        title: `Chat con ${astro.name || "Astro"}`.slice(0, 120),
+      })
+        .then((conversation) => {
+          const normalizedConversation = normalizeConversation(
+            conversation,
+            astros,
+          );
+
+          setConversations((currentConversations) => [
+            normalizedConversation,
+            ...currentConversations.filter(
+              (current) => current.id !== normalizedConversation.id,
+            ),
+          ]);
+          setActiveConversationId(normalizedConversation.id);
+          setConversationsError("");
+
+          return normalizedConversation;
+        })
+        .catch((error) => {
+          setConversationsError(
+            error.message || "No se pudo crear la conversación.",
+          );
+          throw error;
+        })
+        .finally(() => {
+          conversationCreations.current.delete(astroId);
+        });
+
+      conversationCreations.current.set(astroId, creation);
+      return creation;
+    },
+    [astros],
+  );
+
+  const deleteConversation = useCallback(async (conversationId) => {
+    const pendingDeletion = conversationDeletions.current.get(conversationId);
+    if (pendingDeletion) return pendingDeletion;
+
+    setConversationsError("");
+    const deletion = deleteConversationRequest(conversationId)
+      .then((response) => {
+        setConversations((currentConversations) =>
+          currentConversations.filter(
+            (conversation) => conversation.id !== conversationId,
+          ),
+        );
+        setActiveConversationId((currentId) =>
+          currentId === conversationId ? null : currentId,
+        );
+
+        return response;
+      })
+      .catch((error) => {
+        setConversationsError(
+          error.message || "No se pudo eliminar la conversación.",
+        );
+        throw error;
+      })
+      .finally(() => {
+        conversationDeletions.current.delete(conversationId);
+      });
+
+    conversationDeletions.current.set(conversationId, deletion);
+    return deletion;
+  }, []);
 
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem("astrochat-favorites");
@@ -597,6 +779,15 @@ export function AstroChatProvider({ children }) {
         loadingAstros,
         astrosError,
         refreshAstros,
+        conversations,
+        loadingConversations,
+        conversationsError,
+        activeConversation,
+        activeConversationId,
+        refreshConversations,
+        selectConversation,
+        createConversation,
+        deleteConversation,
         messages,
         favorites,
         toggleFavorite,
