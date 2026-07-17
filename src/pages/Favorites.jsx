@@ -1,12 +1,20 @@
 import { useContext } from "react";
-import { AstroChatContext } from "../context/AstroChatContext";
+import { AstroChatContext } from "../context/astro-chat-context";
 import { NavLink } from "react-router-dom";
-import { getImageSource, handleImageError } from "../utils/image";
+import {
+  getImageFallbackSource,
+  getImageSource,
+  handleImageError,
+} from "../utils/image";
 
 function Favorites() {
-  const { objects, favorites } = useContext(AstroChatContext);
+  const { objects, favorites, loadingAstros, astrosError } =
+    useContext(AstroChatContext);
+  const safeObjects = Array.isArray(objects) ? objects : [];
 
-  const favoriteObjects = objects.filter((obj) => favorites.includes(obj.id));
+  const favoriteObjects = safeObjects.filter((obj) =>
+    favorites.includes(obj.demoId || obj.id),
+  );
 
   return (
     <div
@@ -22,7 +30,11 @@ function Favorites() {
         Tus objetos astronómicos destacados.
       </p>
 
-      {favoriteObjects.length === 0 ? (
+      {loadingAstros ? (
+        <p style={{ color: "#94a3b8" }}>Cargando astros...</p>
+      ) : astrosError ? (
+        <p style={{ color: "#94a3b8" }}>No se pudieron cargar los astros</p>
+      ) : favoriteObjects.length === 0 ? (
         <p style={{ color: "#94a3b8" }}>Todavía no marcaste favoritos.</p>
       ) : (
         <div style={{ display: "grid", gap: "16px", maxWidth: "700px" }}>
@@ -49,6 +61,7 @@ function Favorites() {
                 <img
                   src={imageSrc}
                   alt={obj.name || obj.astro?.name || "Astro"}
+                  data-fallback-src={getImageFallbackSource(obj)}
                   style={{
                     width: "58px",
                     height: "58px",
@@ -61,7 +74,8 @@ function Favorites() {
                 <div>
                   <h3 style={{ margin: 0, color: "#f8fafc" }}>{obj.name}</h3>
                   <p style={{ margin: "4px 0 0 0", color: "#94a3b8" }}>
-                    {obj.type} — {obj.galaxy}
+                    {obj.type}
+                    {obj.constellation ? ` — ${obj.constellation}` : ""}
                   </p>
                 </div>
               </div>

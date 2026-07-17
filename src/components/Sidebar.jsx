@@ -1,12 +1,22 @@
 import { useContext } from "react";
-import { AstroChatContext } from "../context/AstroChatContext";
+import { AstroChatContext } from "../context/astro-chat-context";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
-import { getImageSource, handleImageError } from "../utils/image";
+import {
+  getImageFallbackSource,
+  getImageSource,
+  handleImageError,
+} from "../utils/image";
 
 function Sidebar() {
-  const { objects, messages, favorites, unreadCounts } =
-    useContext(AstroChatContext);
+  const {
+    objects,
+    messages,
+    favorites,
+    unreadCounts,
+    loadingAstros,
+    astrosError,
+  } = useContext(AstroChatContext);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const userImageSrc = getImageSource(user, "/astro-icon.jpg");
@@ -23,7 +33,8 @@ function Sidebar() {
     navigate("/login", { replace: true });
   }
 
-  const filteredObjects = objects
+  const safeObjects = Array.isArray(objects) ? objects : [];
+  const filteredObjects = safeObjects
     .filter((obj) => obj.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       const aFav = favorites.includes(a.id);
@@ -80,6 +91,7 @@ function Sidebar() {
               src={userImageSrc}
               alt={user?.name || "Usuario"}
               className="mobile-user-avatar"
+              data-fallback-src={getImageFallbackSource(user)}
               onError={handleImageError}
             />
             <h1 className="sidebar-title">AstroChat 🌌</h1>
@@ -102,9 +114,17 @@ function Sidebar() {
       </div>
 
       <div className="chat-list">
-        {filteredObjects.map((obj) => {
+        {loadingAstros ? (
+          <p className="no-results">Cargando astros...</p>
+        ) : astrosError ? (
+          <p className="no-results">No se pudieron cargar los astros</p>
+        ) : filteredObjects.length === 0 ? (
+          <p className="no-results">No hay astros disponibles.</p>
+        ) : (
+          filteredObjects.map((obj) => {
           const unreadCount = getUnreadCount(obj.id);
-          const isFavorite = favorites.includes(obj.id);
+          const favoriteId = obj.demoId || obj.id;
+          const isFavorite = favorites.includes(favoriteId);
           const imageSrc = getImageSource(obj);
 
           return (
@@ -119,6 +139,7 @@ function Sidebar() {
                 src={imageSrc}
                 alt={obj.name || obj.astro?.name || "Astro"}
                 className="astro-avatar"
+                data-fallback-src={getImageFallbackSource(obj)}
                 onError={handleImageError}
               />
 
@@ -142,7 +163,8 @@ function Sidebar() {
               </div>
             </NavLink>
           );
-        })}
+          })
+        )}
       </div>
     </div>
   );

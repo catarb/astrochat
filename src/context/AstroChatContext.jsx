@@ -1,9 +1,15 @@
-import { createContext, useState, useEffect } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useAuth } from "./auth-context";
+import { AstroChatContext } from "./astro-chat-context";
+import { getAstros } from "../services/astro.service";
+import { ASTRO_IMAGE_FALLBACK, getImageSource } from "../utils/image";
 
-export const AstroChatContext = createContext();
-
-export function AstroChatProvider({ children }) {
-  const [objects] = useState([
+const DEMO_ASTROS = [
     {
       id: "sn1987a",
       name: "SN 1987A",
@@ -136,7 +142,84 @@ export function AstroChatProvider({ children }) {
         "Remanente ubicado en la región H II N63, inmerso en un entorno muy rico en gas interestelar.",
       image: "/n63a.jpg",
     },
-  ]);
+];
+
+const normalizeImageKey = (value = "") =>
+  value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const findDemoAstro = (astro) => {
+  const keys = [astro.name, astro.slug].filter(Boolean).map(normalizeImageKey);
+
+  return DEMO_ASTROS.find((demoAstro) => {
+    const demoKeys = [demoAstro.name, demoAstro.id].map(normalizeImageKey);
+
+    return keys.some((key) => demoKeys.includes(key));
+  });
+};
+
+const normalizeAstro = (astro) => {
+  const demoAstro = findDemoAstro(astro);
+  const localImage = demoAstro?.image || ASTRO_IMAGE_FALLBACK;
+
+  return {
+    ...astro,
+    id: astro._id || astro.id,
+    demoId: demoAstro?.id,
+    localImage,
+    image: getImageSource(astro, localImage),
+  };
+};
+
+export function AstroChatProvider({ children }) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [astros, setAstros] = useState([]);
+  const [loadingAstros, setLoadingAstros] = useState(false);
+  const [astrosError, setAstrosError] = useState("");
+  const astroRequestId = useRef(0);
+
+  const refreshAstros = useCallback(async () => {
+    if (!isAuthenticated) return [];
+
+    const requestId = ++astroRequestId.current;
+    setLoadingAstros(true);
+    setAstrosError("");
+
+    try {
+      const responseAstros = await getAstros();
+      const normalizedAstros = responseAstros.map(normalizeAstro);
+
+      if (requestId === astroRequestId.current) {
+        setAstros(normalizedAstros);
+      }
+
+      return normalizedAstros;
+    } catch (error) {
+      if (requestId === astroRequestId.current) {
+        setAstros([]);
+        setAstrosError(error.message || "No se pudieron cargar los astros");
+      }
+
+      return [];
+    } finally {
+      if (requestId === astroRequestId.current) {
+        setLoadingAstros(false);
+      }
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      astroRequestId.current += 1;
+      setAstros([]);
+      setAstrosError("");
+      setLoadingAstros(false);
+      return;
+    }
+
+    refreshAstros();
+  }, [authLoading, isAuthenticated, refreshAstros]);
 
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem("astrochat-favorites");
@@ -509,7 +592,11 @@ export function AstroChatProvider({ children }) {
   return (
     <AstroChatContext.Provider
       value={{
-        objects,
+        astros,
+        objects: astros,
+        loadingAstros,
+        astrosError,
+        refreshAstros,
         messages,
         favorites,
         toggleFavorite,

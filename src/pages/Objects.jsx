@@ -1,10 +1,16 @@
 import { useContext } from "react";
-import { AstroChatContext } from "../context/AstroChatContext";
+import { AstroChatContext } from "../context/astro-chat-context";
 import { NavLink } from "react-router-dom";
-import { getImageSource, handleImageError } from "../utils/image";
+import {
+  getImageFallbackSource,
+  getImageSource,
+  handleImageError,
+} from "../utils/image";
 
 function Objects() {
-  const { objects } = useContext(AstroChatContext);
+  const { objects, loadingAstros, astrosError } =
+    useContext(AstroChatContext);
+  const safeObjects = Array.isArray(objects) ? objects : [];
 
   return (
     <div
@@ -21,7 +27,16 @@ function Objects() {
       </p>
 
       <div style={{ display: "grid", gap: "16px", maxWidth: "700px" }}>
-        {objects.map((obj) => {
+        {loadingAstros ? (
+          <p style={{ color: "#94a3b8" }}>Cargando astros...</p>
+        ) : astrosError ? (
+          <p style={{ color: "#94a3b8" }}>
+            No se pudieron cargar los astros
+          </p>
+        ) : safeObjects.length === 0 ? (
+          <p style={{ color: "#94a3b8" }}>No hay astros disponibles.</p>
+        ) : (
+          safeObjects.map((obj) => {
           const imageSrc = getImageSource(obj);
 
           return (
@@ -44,6 +59,7 @@ function Objects() {
               <img
                 src={imageSrc}
                 alt={obj.name || obj.astro?.name || "Astro"}
+                data-fallback-src={getImageFallbackSource(obj)}
                 style={{
                   width: "58px",
                   height: "58px",
@@ -56,13 +72,15 @@ function Objects() {
               <div>
                 <h3 style={{ margin: 0, color: "#f8fafc" }}>{obj.name}</h3>
                 <p style={{ margin: "4px 0 0 0", color: "#94a3b8" }}>
-                  {obj.type} — {obj.galaxy}
+                  {obj.type}
+                  {obj.constellation ? ` — ${obj.constellation}` : ""}
                 </p>
               </div>
             </div>
             </NavLink>
           );
-        })}
+          })
+        )}
       </div>
     </div>
   );

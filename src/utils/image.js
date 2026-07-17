@@ -7,8 +7,20 @@ export const getImageSource = (item, defaultSource = ASTRO_IMAGE_FALLBACK) =>
   item?.avatar ||
   defaultSource;
 
+export const getImageFallbackSource = (item) =>
+  item?.localImage || ASTRO_IMAGE_FALLBACK;
+
 export const handleImageError = (event) => {
-  if (!event.currentTarget.src.endsWith(ASTRO_IMAGE_FALLBACK)) {
-    event.currentTarget.src = ASTRO_IMAGE_FALLBACK;
+  const image = event.currentTarget;
+  const fallback = image.dataset.fallbackSrc || ASTRO_IMAGE_FALLBACK;
+
+  if (!image.src.endsWith(fallback)) {
+    image.src = fallback;
+    return;
+  }
+
+  if (fallback !== ASTRO_IMAGE_FALLBACK) {
+    image.dataset.fallbackSrc = ASTRO_IMAGE_FALLBACK;
+    image.src = ASTRO_IMAGE_FALLBACK;
   }
 };

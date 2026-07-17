@@ -1,8 +1,12 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
-import { AstroChatContext } from "../context/AstroChatContext";
+import { AstroChatContext } from "../context/astro-chat-context";
 import { useAuth } from "../context/auth-context";
-import { getImageSource, handleImageError } from "../utils/image";
+import {
+  getImageFallbackSource,
+  getImageSource,
+  handleImageError,
+} from "../utils/image";
 
 function LeftBar() {
   const location = useLocation();
@@ -20,7 +24,7 @@ function LeftBar() {
   }
 
   function handleRandomObject() {
-    if (!objects || objects.length === 0) return;
+    if (!Array.isArray(objects) || objects.length === 0) return;
 
     const randomObject = objects[Math.floor(Math.random() * objects.length)];
     navigate(`/chat/${randomObject.id}`);
@@ -33,6 +37,7 @@ function LeftBar() {
           src={userImageSrc}
           alt={user?.name || "Usuario"}
           className="user-avatar"
+          data-fallback-src={getImageFallbackSource(user)}
           onError={handleImageError}
         />
       </div>

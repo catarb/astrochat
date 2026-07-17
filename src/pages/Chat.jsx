@@ -4,11 +4,15 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { useContext, useMemo, useState, useEffect } from "react";
-import { AstroChatContext } from "../context/AstroChatContext";
+import { AstroChatContext } from "../context/astro-chat-context";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
 import QuickQuestions from "../components/QuickQuestions";
-import { getImageSource, handleImageError } from "../utils/image";
+import {
+  getImageFallbackSource,
+  getImageSource,
+  handleImageError,
+} from "../utils/image";
 
 import {
   ArrowLeft,
@@ -17,6 +21,8 @@ import {
   MoreVertical,
   Info,
 } from "lucide-react";
+
+const EMPTY_MESSAGES = [];
 
 function Chat() {
   const { id } = useParams();
@@ -38,12 +44,16 @@ function Chat() {
     sendMessage,
     clearChat,
     resetChat,
+    loadingAstros,
+    astrosError,
   } = useContext(AstroChatContext);
 
-  const currentObject = objects.find((obj) => obj.id === id);
+  const safeObjects = Array.isArray(objects) ? objects : [];
+  const currentObject = safeObjects.find((obj) => obj.id === id);
   const currentImageSrc = getImageSource(currentObject);
-  const currentMessages = messages[id] || [];
-  const isFavorite = favorites.includes(id);
+  const chatDataId = currentObject?.demoId || id;
+  const currentMessages = messages[chatDataId] || EMPTY_MESSAGES;
+  const isFavorite = favorites.includes(chatDataId);
 
   const filteredMessages = useMemo(() => {
     if (!searchText.trim()) return currentMessages;
@@ -89,12 +99,18 @@ function Chat() {
     };
   }, []);
 
-  if (!currentObject) {
+  if (loadingAstros || astrosError || !currentObject) {
+    const statusMessage = loadingAstros
+      ? "Cargando astros..."
+      : astrosError
+        ? "No se pudieron cargar los astros"
+        : "Objeto no encontrado.";
+
     return (
       <div className="chat-container">
         <div className="chat-body">
           <div className="messages-list">
-            <p style={{ color: "#94a3b8" }}>Objeto no encontrado.</p>
+            <p style={{ color: "#94a3b8" }}>{statusMessage}</p>
           </div>
         </div>
       </div>
@@ -102,7 +118,7 @@ function Chat() {
   }
 
   function handleSend(text) {
-    sendMessage(id, {
+    sendMessage(chatDataId, {
       sender: "user",
       text,
       time: new Date().toLocaleTimeString([], {
@@ -113,7 +129,7 @@ function Chat() {
   }
 
   function handleQuickQuestion(question) {
-    sendMessage(id, {
+    sendMessage(chatDataId, {
       sender: "user",
       text: question,
       time: new Date().toLocaleTimeString([], {
@@ -137,6 +153,7 @@ function Chat() {
             src={currentImageSrc}
             alt={currentObject.name || currentObject.astro?.name || "Astro"}
             className="chat-avatar"
+            data-fallback-src={getImageFallbackSource(currentObject)}
             onError={handleImageError}
           />
 
@@ -154,7 +171,7 @@ function Chat() {
                 isFavorite ? "favorite-active" : ""
               }`}
               aria-label="Marcar favorito"
-              onClick={() => toggleFavorite(id)}
+              onClick={() => toggleFavorite(chatDataId)}
             >
               <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
             </button>
@@ -215,7 +232,7 @@ function Chat() {
                   type="button"
                   className="chat-menu-item"
                   onClick={() => {
-                    resetChat(id);
+                    resetChat(chatDataId);
                     setShowMenu(false);
                   }}
                 >
@@ -226,7 +243,7 @@ function Chat() {
                   type="button"
                   className="chat-menu-item"
                   onClick={() => {
-                    clearChat(id);
+                    clearChat(chatDataId);
                     setShowMenu(false);
                   }}
                 >
@@ -277,6 +294,7 @@ function Chat() {
               src={currentImageSrc}
               alt={currentObject.name || currentObject.astro?.name || "Astro"}
               className="object-profile-image"
+              data-fallback-src={getImageFallbackSource(currentObject)}
               onError={handleImageError}
             />
 
@@ -285,15 +303,22 @@ function Chat() {
             <p>
               <strong>Tipo:</strong> {currentObject.type}
             </p>
-            <p>
-              <strong>Galaxia:</strong> {currentObject.galaxy}
-            </p>
-            <p>
-              <strong>Año:</strong> {currentObject.year}
-            </p>
-            <p>
-              <strong>Distancia:</strong> {currentObject.distance}
-            </p>
+            {currentObject.scientificName && (
+              <p>
+                <strong>Nombre científico:</strong>{" "}
+                {currentObject.scientificName}
+              </p>
+            )}
+            {currentObject.constellation && (
+              <p>
+                <strong>Constelación:</strong> {currentObject.constellation}
+              </p>
+            )}
+            {currentObject.distance && (
+              <p>
+                <strong>Distancia:</strong> {currentObject.distance}
+              </p>
+            )}
 
             <p className="object-description">{currentObject.description}</p>
           </div>
