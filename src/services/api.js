@@ -9,10 +9,11 @@ const UNAUTHORIZED_EVENT = "astrochat:unauthorized";
 let unauthorizedHandled = false;
 
 export class ApiError extends Error {
-  constructor(message, status = 0) {
+  constructor(message, status = 0, errors = []) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.errors = Array.isArray(errors) ? errors : [];
   }
 }
 
@@ -86,6 +87,7 @@ export const apiRequest = async (
     throw new ApiError(
       responseData?.message || "No se pudo completar la solicitud.",
       response.status,
+      responseData?.errors,
     );
   }
 

@@ -33,14 +33,20 @@ function Chat() {
   const [showSearch, setShowSearch] = useState(!!initialSearch);
   const [searchText, setSearchText] = useState(initialSearch);
   const [showMenu, setShowMenu] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [titleDraft, setTitleDraft] = useState("");
+  const [renameError, setRenameError] = useState("");
+  const [isSubmittingRename, setIsSubmittingRename] = useState(false);
   const [messageDrafts, setMessageDrafts] = useState({});
   const chatSubmissionInProgress = useRef(false);
+  const renameSubmissionInProgress = useRef(false);
 
   const {
     conversations,
     activeConversation,
     activeConversationId,
     selectConversation,
+    updateConversation,
     deleteConversation,
     messages,
     favorites,
@@ -205,6 +211,72 @@ function Chat() {
     }
   }
 
+  function startRenaming() {
+    setTitleDraft(currentConversation.title || "");
+    setRenameError("");
+    setIsRenaming(true);
+  }
+
+  function cancelRenaming() {
+    if (isSubmittingRename) return;
+
+    setIsRenaming(false);
+    setTitleDraft("");
+    setRenameError("");
+  }
+
+  async function handleRenameConversation(event) {
+    event.preventDefault();
+    if (renameSubmissionInProgress.current) return;
+
+    const nextTitle = titleDraft.trim();
+
+    if (!nextTitle) {
+      setRenameError("El título es obligatorio.");
+      return;
+    }
+
+    if (nextTitle.length < 2 || nextTitle.length > 120) {
+      setRenameError("El título debe tener entre 2 y 120 caracteres.");
+      return;
+    }
+
+    if (nextTitle === (currentConversation.title || "").trim()) {
+      cancelRenaming();
+      setShowMenu(false);
+      return;
+    }
+
+    renameSubmissionInProgress.current = true;
+    setIsSubmittingRename(true);
+    setRenameError("");
+
+    try {
+      await updateConversation(id, { title: nextTitle });
+      setIsRenaming(false);
+      setTitleDraft("");
+      setShowMenu(false);
+    } catch (requestError) {
+      if (requestError?.status === 400) {
+        const titleError = requestError.errors?.find(
+          (error) => error?.field === "title" || error?.path === "title",
+        );
+        setRenameError(
+          titleError?.message || "El título de la conversación no es válido.",
+        );
+      } else if (requestError?.status === 403) {
+        setRenameError("No tenés permiso para editar esta conversación.");
+      } else if (requestError?.status === 404) {
+        setRenameError("Conversación no encontrada.");
+      } else if (requestError?.status !== 401) {
+        setRenameError("No se pudo actualizar la conversación.");
+      }
+    } finally {
+      renameSubmissionInProgress.current = false;
+      setIsSubmittingRename(false);
+    }
+  }
+
   return (
     <div className="chat-container">
       <div className="chat-header">
@@ -287,7 +359,11 @@ function Chat() {
               type="button"
               className="header-icon-button"
               aria-label="Más opciones"
-              onClick={() => setShowMenu((prev) => !prev)}
+              disabled={isSubmittingRename}
+              onClick={() => {
+                if (showMenu) cancelRenaming();
+                setShowMenu((prev) => !prev);
+              }}
             >
               <MoreVertical size={18} />
             </button>
@@ -296,35 +372,85 @@ function Chat() {
 
             {showMenu && (
               <div className="chat-menu">
-                <button
-                  type="button"
-                  className="chat-menu-item"
-                  onClick={() => {
-                    refreshMessages(id);
-                    setShowMenu(false);
-                  }}
-                >
-                  Recargar mensajes
-                </button>
+                {isRenaming ? (
+                  <form
+                    className="chat-rename-form"
+                    onSubmit={handleRenameConversation}
+                    noValidate
+                  >
+                    <label htmlFor="conversation-title">Título</label>
+                    <input
+                      id="conversation-title"
+                      type="text"
+                      value={titleDraft}
+                      onChange={(event) => {
+                        setTitleDraft(event.target.value);
+                        setRenameError("");
+                      }}
+                      maxLength={120}
+                      disabled={isSubmittingRename}
+                      autoFocus
+                      aria-invalid={Boolean(renameError)}
+                    />
+                    {renameError && (
+                      <small className="chat-rename-error" role="alert">
+                        {renameError}
+                      </small>
+                    )}
+                    <div className="chat-rename-actions">
+                      <button
+                        type="button"
+                        onClick={cancelRenaming}
+                        disabled={isSubmittingRename}
+                      >
+                        Cancelar
+                      </button>
+                      <button type="submit" disabled={isSubmittingRename}>
+                        {isSubmittingRename ? "Guardando..." : "Guardar"}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="chat-menu-item"
+                      onClick={startRenaming}
+                    >
+                      Renombrar
+                    </button>
 
-                <button
-                  type="button"
-                  className="chat-menu-item"
-                  onClick={handleDeleteConversation}
-                >
-                  Borrar conversación
-                </button>
+                    <button
+                      type="button"
+                      className="chat-menu-item"
+                      onClick={() => {
+                        refreshMessages(id);
+                        setShowMenu(false);
+                      }}
+                    >
+                      Recargar mensajes
+                    </button>
 
-                <button
-                  type="button"
-                  className="chat-menu-item"
-                  onClick={() => {
-                    setShowProfile(false);
-                    setShowMenu(false);
-                  }}
-                >
-                  Cerrar perfil
-                </button>
+                    <button
+                      type="button"
+                      className="chat-menu-item"
+                      onClick={handleDeleteConversation}
+                    >
+                      Borrar conversación
+                    </button>
+
+                    <button
+                      type="button"
+                      className="chat-menu-item"
+                      onClick={() => {
+                        setShowProfile(false);
+                        setShowMenu(false);
+                      }}
+                    >
+                      Cerrar perfil
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>

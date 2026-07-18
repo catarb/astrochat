@@ -30,6 +30,23 @@ export const createConversation = async ({ astro, title }) => {
   return normalizeConversationId(conversation);
 };
 
+export const updateConversation = async (conversationId, payload) => {
+  const response = await apiRequest(
+    `/conversations/${encodeURIComponent(conversationId)}`,
+    {
+      method: "PUT",
+      body: { title: payload.title },
+    },
+  );
+  const conversation = response?.data?.conversation;
+
+  if (!conversation) {
+    throw new ApiError("La respuesta de la conversación no es válida.", 500);
+  }
+
+  return normalizeConversationId(conversation);
+};
+
 export const deleteConversation = async (conversationId) => {
   return apiRequest(`/conversations/${conversationId}`, {
     method: "DELETE",

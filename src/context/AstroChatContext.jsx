@@ -6,11 +6,17 @@ import {
 } from "react";
 import { useAuth } from "./auth-context";
 import { AstroChatContext } from "./astro-chat-context";
-import { getAstros } from "../services/astro.service";
+import {
+  createAstro as createAstroRequest,
+  deleteAstro as deleteAstroRequest,
+  getAstros,
+  updateAstro as updateAstroRequest,
+} from "../services/astro.service";
 import {
   createConversation as createConversationRequest,
   deleteConversation as deleteConversationRequest,
   getConversations,
+  updateConversation as updateConversationRequest,
 } from "../services/conversation.service";
 import {
   createMessage as createMessageRequest,
@@ -321,6 +327,59 @@ export function AstroChatProvider({ children }) {
     refreshAstros();
   }, [authLoading, isAuthenticated, refreshAstros]);
 
+  const createAstro = useCallback(async (payload) => {
+    const createdAstro = await createAstroRequest(payload);
+    const normalizedAstro = normalizeAstro(createdAstro);
+
+    if (normalizedAstro.isActive) {
+      setAstros((currentAstros) => [
+        normalizedAstro,
+        ...currentAstros.filter((astro) => astro.id !== normalizedAstro.id),
+      ]);
+    }
+
+    return normalizedAstro;
+  }, []);
+
+  const updateAstro = useCallback(async (astroId, payload) => {
+    const updatedAstro = await updateAstroRequest(astroId, payload);
+    const normalizedAstro = normalizeAstro(updatedAstro);
+
+    setAstros((currentAstros) => {
+      const currentIndex = currentAstros.findIndex(
+        (astro) => astro.id === normalizedAstro.id,
+      );
+
+      if (!normalizedAstro.isActive) {
+        return currentAstros.filter(
+          (astro) => astro.id !== normalizedAstro.id,
+        );
+      }
+
+      if (currentIndex === -1) {
+        return [normalizedAstro, ...currentAstros];
+      }
+
+      return currentAstros.map((astro, index) =>
+        index === currentIndex ? normalizedAstro : astro,
+      );
+    });
+
+    return normalizedAstro;
+  }, []);
+
+  const deleteAstro = useCallback(async (astroId) => {
+    const response = await deleteAstroRequest(astroId);
+
+    setAstros((currentAstros) =>
+      currentAstros.filter(
+        (astro) => (astro.id || astro._id) !== astroId,
+      ),
+    );
+
+    return response;
+  }, []);
+
   const refreshConversations = useCallback(async () => {
     if (!isAuthenticated) return [];
 
@@ -625,6 +684,30 @@ export function AstroChatProvider({ children }) {
 
       conversationCreations.current.set(astroId, creation);
       return creation;
+    },
+    [astros],
+  );
+
+  const updateConversation = useCallback(
+    async (conversationId, payload) => {
+      const updatedConversation = await updateConversationRequest(
+        conversationId,
+        payload,
+      );
+      const normalizedConversation = normalizeConversation(
+        updatedConversation,
+        astros,
+      );
+
+      setConversations((currentConversations) =>
+        currentConversations.map((conversation) =>
+          (conversation.id || conversation._id) === normalizedConversation.id
+            ? normalizedConversation
+            : conversation,
+        ),
+      );
+
+      return normalizedConversation;
     },
     [astros],
   );
@@ -1041,6 +1124,9 @@ export function AstroChatProvider({ children }) {
         loadingAstros,
         astrosError,
         refreshAstros,
+        createAstro,
+        updateAstro,
+        deleteAstro,
         conversations,
         loadingConversations,
         conversationsError,
@@ -1049,6 +1135,7 @@ export function AstroChatProvider({ children }) {
         refreshConversations,
         selectConversation,
         createConversation,
+        updateConversation,
         deleteConversation,
         messages,
         loadingMessages,

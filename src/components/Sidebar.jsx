@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { Database } from "lucide-react";
 import { AstroChatContext } from "../context/astro-chat-context";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
@@ -125,6 +126,16 @@ function Sidebar() {
           onChange={handleSearch}
           className="search-input"
         />
+
+        <NavLink
+          to="/admin/astros"
+          className={({ isActive }) =>
+            `mobile-admin-link${isActive ? " active" : ""}`
+          }
+        >
+          <Database size={18} aria-hidden="true" />
+          Administrar Astros
+        </NavLink>
       </div>
 
       <div className="chat-list">

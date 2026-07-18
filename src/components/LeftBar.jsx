@@ -1,5 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
+import { Database } from "lucide-react";
 import { AstroChatContext } from "../context/astro-chat-context";
 import { useAuth } from "../context/auth-context";
 import {
@@ -83,6 +84,19 @@ function LeftBar() {
           🔭
         </NavLink>
         <span className="leftbar-tooltip">Objetos</span>
+      </div>
+
+      <div className="leftbar-tooltip-wrapper">
+        <NavLink
+          to="/admin/astros"
+          className={({ isActive }) =>
+            isActive ? "leftbar-btn active" : "leftbar-btn"
+          }
+          aria-label="Administrar Astros"
+        >
+          <Database size={20} aria-hidden="true" />
+        </NavLink>
+        <span className="leftbar-tooltip">Administrar Astros</span>
       </div>
 
       <div className="leftbar-tooltip-wrapper">
