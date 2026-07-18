@@ -22,8 +22,6 @@ import {
   Info,
 } from "lucide-react";
 
-const EMPTY_MESSAGES = [];
-
 function Chat() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -46,7 +44,10 @@ function Chat() {
     favorites,
     toggleFavorite,
     sendMessage,
-    resetChat,
+    refreshMessages,
+    loadingMessages,
+    messagesError,
+    sendingMessage,
     loadingConversations,
     conversationsError,
   } = useContext(AstroChatContext);
@@ -59,14 +60,23 @@ function Chat() {
   const currentObject = currentConversation?.astro;
   const currentImageSrc = getImageSource(currentObject);
   const chatDataId = currentObject?.demoId || currentObject?.id || id;
-  const currentMessages = messages[chatDataId] || EMPTY_MESSAGES;
+  const currentMessages = useMemo(
+    () =>
+      Array.isArray(messages)
+        ? messages.filter(
+            (message) =>
+              message.role === "user" || message.role === "assistant",
+          )
+        : [],
+    [messages],
+  );
   const isFavorite = favorites.includes(chatDataId);
 
   const filteredMessages = useMemo(() => {
     if (!searchText.trim()) return currentMessages;
 
     return currentMessages.filter((msg) =>
-      (msg.text || "").toLowerCase().includes(searchText.toLowerCase())
+      (msg.content || "").toLowerCase().includes(searchText.toLowerCase())
     );
   }, [currentMessages, searchText]);
 
@@ -130,26 +140,16 @@ function Chat() {
     );
   }
 
-  function handleSend(text) {
-    sendMessage(chatDataId, {
-      sender: "user",
-      text,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    });
+  async function handleSend(text) {
+    return sendMessage(text);
   }
 
-  function handleQuickQuestion(question) {
-    sendMessage(chatDataId, {
-      sender: "user",
-      text: question,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    });
+  async function handleQuickQuestion(question) {
+    try {
+      await sendMessage(question);
+    } catch {
+      // El contexto ya expone un mensaje de error apto para la interfaz.
+    }
   }
 
   async function handleDeleteConversation() {
@@ -161,8 +161,6 @@ function Chat() {
       setShowMenu(false);
     }
   }
-
-  const botTyping = currentMessages.some((msg) => msg.typing);
 
   return (
     <div className="chat-container">
@@ -182,7 +180,7 @@ function Chat() {
 
           <div className="chat-header-info">
             <h2>{currentObject.name}</h2>
-            <p>{botTyping ? "AstroBot está escribiendo..." : "en línea"}</p>
+            <p>en línea</p>
           </div>
         </div>
 
@@ -255,11 +253,11 @@ function Chat() {
                   type="button"
                   className="chat-menu-item"
                   onClick={() => {
-                    resetChat(chatDataId);
+                    refreshMessages(id);
                     setShowMenu(false);
                   }}
                 >
-                  Reiniciar chat
+                  Recargar mensajes
                 </button>
 
                 <button
@@ -344,19 +342,35 @@ function Chat() {
           </div>
         )}
 
-        {!showSearch && <QuickQuestions onAsk={handleQuickQuestion} />}
+        {!showSearch && (
+          <QuickQuestions
+            onAsk={handleQuickQuestion}
+            disabled={sendingMessage}
+          />
+        )}
 
         <div className="messages-list">
-          {showSearch && searchText.trim() && filteredMessages.length === 0 ? (
+          {loadingMessages ? (
+            <p className="no-results">Cargando mensajes...</p>
+          ) : messagesError && currentMessages.length === 0 ? (
+            <p className="no-results">{messagesError}</p>
+          ) : showSearch && searchText.trim() && filteredMessages.length === 0 ? (
             <p className="no-results">No se encontraron mensajes.</p>
+          ) : currentMessages.length === 0 ? (
+            <p className="no-results">No hay mensajes todavía.</p>
           ) : (
-            <MessageList messages={filteredMessages} />
+            <>
+              {messagesError && (
+                <p className="no-results">{messagesError}</p>
+              )}
+              <MessageList messages={filteredMessages} />
+            </>
           )}
         </div>
       </div>
 
       <div className="message-input-wrapper">
-        <MessageInput onSend={handleSend} />
+        <MessageInput onSend={handleSend} disabled={sendingMessage} />
       </div>
     </div>
   );

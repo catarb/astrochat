@@ -12,6 +12,10 @@ import {
   deleteConversation as deleteConversationRequest,
   getConversations,
 } from "../services/conversation.service";
+import {
+  createMessage as createMessageRequest,
+  getMessagesByConversation,
+} from "../services/message.service";
 import { ASTRO_IMAGE_FALLBACK, getImageSource } from "../utils/image";
 
 const DEMO_ASTROS = [
@@ -178,6 +182,34 @@ const normalizeAstro = (astro) => {
 const getEntityId = (entity) =>
   typeof entity === "string" ? entity : entity?._id || entity?.id;
 
+const isValidMongoId = (value) => /^[a-f\d]{24}$/i.test(value || "");
+
+const getMessageError = (error, action) => {
+  if (error?.status === 400) {
+    return "El mensaje no es válido. Revisá el contenido e intentá nuevamente.";
+  }
+
+  if (error?.status === 401) {
+    return "Tu sesión venció. Iniciá sesión nuevamente.";
+  }
+
+  if (error?.status === 403) {
+    return "No tenés permiso para acceder a esta conversación.";
+  }
+
+  if (error?.status === 404) {
+    return "La conversación ya no existe o no está disponible.";
+  }
+
+  if (error?.status === 0) {
+    return "No se pudo conectar con el servidor. Intentá nuevamente.";
+  }
+
+  return action === "send"
+    ? "No se pudo enviar el mensaje. Intentá nuevamente."
+    : "No se pudieron cargar los mensajes.";
+};
+
 const normalizeConversation = (conversation, astros) => {
   const conversationAstro = conversation.astro;
   const astroId = getEntityId(conversationAstro);
@@ -208,6 +240,13 @@ export function AstroChatProvider({ children }) {
   const conversationRequestId = useRef(0);
   const conversationCreations = useRef(new Map());
   const conversationDeletions = useRef(new Map());
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [messagesError, setMessagesError] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const messageRequestId = useRef(0);
+  const messageRequests = useRef(new Map());
+  const messageSendInProgress = useRef(false);
 
   const refreshAstros = useCallback(async () => {
     if (!isAuthenticated) return [];
@@ -317,10 +356,127 @@ export function AstroChatProvider({ children }) {
     conversations.find(
       (conversation) => conversation.id === activeConversationId,
     ) || null;
+  const activeConversationIdRef = useRef(activeConversationId);
+  activeConversationIdRef.current = activeConversationId;
 
   const selectConversation = useCallback((conversationId) => {
     setActiveConversationId(conversationId || null);
   }, []);
+
+  const clearMessages = useCallback(() => {
+    messageRequestId.current += 1;
+    setMessages([]);
+    setMessagesError("");
+    setLoadingMessages(false);
+  }, []);
+
+  const refreshMessages = useCallback(
+    async (conversationId = activeConversationId) => {
+      if (
+        authLoading ||
+        !isAuthenticated ||
+        !isValidMongoId(conversationId)
+      ) {
+        return [];
+      }
+
+      const requestId = ++messageRequestId.current;
+      setLoadingMessages(true);
+      setMessagesError("");
+
+      let request = messageRequests.current.get(conversationId);
+
+      if (!request) {
+        request = getMessagesByConversation(conversationId);
+        messageRequests.current.set(conversationId, request);
+      }
+
+      try {
+        const responseMessages = await request;
+
+        if (requestId === messageRequestId.current) {
+          setMessages(responseMessages);
+        }
+
+        return responseMessages;
+      } catch (error) {
+        if (requestId === messageRequestId.current) {
+          setMessages([]);
+          setMessagesError(getMessageError(error, "load"));
+        }
+
+        return [];
+      } finally {
+        if (messageRequests.current.get(conversationId) === request) {
+          messageRequests.current.delete(conversationId);
+        }
+
+        if (requestId === messageRequestId.current) {
+          setLoadingMessages(false);
+        }
+      }
+    },
+    [activeConversationId, authLoading, isAuthenticated],
+  );
+
+  const sendMessage = useCallback(
+    async (content) => {
+      const trimmedContent = content?.trim();
+      const conversationId = activeConversationId;
+
+      if (!trimmedContent || !isValidMongoId(conversationId)) {
+        return null;
+      }
+
+      if (messageSendInProgress.current) return null;
+
+      messageSendInProgress.current = true;
+      setSendingMessage(true);
+      setMessagesError("");
+
+      try {
+        const createdMessage = await createMessageRequest(conversationId, {
+          role: "user",
+          content: trimmedContent,
+        });
+
+        if (activeConversationIdRef.current === conversationId) {
+          setMessages((currentMessages) => [
+            ...currentMessages,
+            createdMessage,
+          ]);
+        }
+
+        return createdMessage;
+      } catch (error) {
+        if (activeConversationIdRef.current === conversationId) {
+          setMessagesError(getMessageError(error, "send"));
+        }
+
+        throw error;
+      } finally {
+        messageSendInProgress.current = false;
+        setSendingMessage(false);
+      }
+    },
+    [activeConversationId],
+  );
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    clearMessages();
+
+    if (!isAuthenticated || !activeConversation) return;
+
+    refreshMessages(activeConversation.id);
+  }, [
+    activeConversation,
+    authLoading,
+    clearMessages,
+    isAuthenticated,
+    refreshMessages,
+  ]);
 
   const createConversation = useCallback(
     async (astro) => {
@@ -387,6 +543,10 @@ export function AstroChatProvider({ children }) {
           currentId === conversationId ? null : currentId,
         );
 
+        if (activeConversationIdRef.current === conversationId) {
+          clearMessages();
+        }
+
         return response;
       })
       .catch((error) => {
@@ -401,7 +561,7 @@ export function AstroChatProvider({ children }) {
 
     conversationDeletions.current.set(conversationId, deletion);
     return deletion;
-  }, []);
+  }, [clearMessages]);
 
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem("astrochat-favorites");
@@ -497,14 +657,14 @@ export function AstroChatProvider({ children }) {
     ],
   };
 
-  const [messages, setMessages] = useState(() => {
+  const [demoMessages, setDemoMessages] = useState(() => {
     const savedMessages = localStorage.getItem("astrochat-messages");
     return savedMessages ? JSON.parse(savedMessages) : initialMessages;
   });
 
   useEffect(() => {
-    localStorage.setItem("astrochat-messages", JSON.stringify(messages));
-  }, [messages]);
+    localStorage.setItem("astrochat-messages", JSON.stringify(demoMessages));
+  }, [demoMessages]);
 
   useEffect(() => {
     localStorage.setItem("astrochat-favorites", JSON.stringify(favorites));
@@ -527,14 +687,14 @@ export function AstroChatProvider({ children }) {
   }
 
   function clearChat(chatId) {
-    setMessages((prev) => ({
+    setDemoMessages((prev) => ({
       ...prev,
       [chatId]: [],
     }));
   }
 
   function resetChat(chatId) {
-    setMessages((prev) => ({
+    setDemoMessages((prev) => ({
       ...prev,
       [chatId]: initialMessages[chatId] || [],
     }));
@@ -736,8 +896,8 @@ export function AstroChatProvider({ children }) {
     return current.extra[randomIndex];
   }
 
-  function sendMessage(chatId, message) {
-    setMessages((prev) => ({
+  function sendDemoMessage(chatId, message) {
+    setDemoMessages((prev) => ({
       ...prev,
       [chatId]: [...(prev[chatId] || []), message],
     }));
@@ -750,7 +910,7 @@ export function AstroChatProvider({ children }) {
         time: getCurrentTime(),
       };
 
-      setMessages((prev) => ({
+      setDemoMessages((prev) => ({
         ...prev,
         [chatId]: [...(prev[chatId] || []), typingMessage],
       }));
@@ -762,7 +922,7 @@ export function AstroChatProvider({ children }) {
           time: getCurrentTime(),
         };
 
-        setMessages((prev) => {
+        setDemoMessages((prev) => {
           const updated = [...(prev[chatId] || [])];
           updated.pop();
           return { ...prev, [chatId]: [...updated, botMessage] };
@@ -789,9 +949,16 @@ export function AstroChatProvider({ children }) {
         createConversation,
         deleteConversation,
         messages,
+        loadingMessages,
+        messagesError,
+        sendingMessage,
+        refreshMessages,
+        clearMessages,
+        demoMessages,
         favorites,
         toggleFavorite,
         sendMessage,
+        sendDemoMessage,
         clearChat,
         resetChat,
       }}

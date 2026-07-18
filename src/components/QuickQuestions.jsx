@@ -1,4 +1,4 @@
-function QuickQuestions({ onAsk }) {
+function QuickQuestions({ onAsk, disabled = false }) {
   const questions = [
     "¿En qué galaxia estás?",
     "¿A qué distancia estás?",
@@ -14,6 +14,7 @@ function QuickQuestions({ onAsk }) {
           type="button"
           className="quick-question-btn"
           onClick={() => onAsk(question)}
+          disabled={disabled}
         >
           {question}
         </button>

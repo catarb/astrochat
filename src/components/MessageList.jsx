@@ -10,8 +10,8 @@ function MessageList({ messages }) {
 
   return (
     <>
-      {messages.map((message, index) => (
-        <MessageItem key={index} message={message} />
+      {(Array.isArray(messages) ? messages : []).map((message) => (
+        <MessageItem key={message.id} message={message} />
       ))}
       <div ref={bottomRef} />
     </>

@@ -1,25 +1,18 @@
 function MessageItem({ message }) {
-  const isUser = message.sender === "user";
+  const isUser = message.role === "user";
+  const messageTime = message.createdAt
+    ? new Date(message.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
 
   return (
     <div className={`message-row ${isUser ? "user" : "bot"}`}>
       <div className={`message-bubble ${isUser ? "user" : "bot"}`}>
-        {message.typing ? <TypingDots /> : <span>{message.text}</span>}
-
-        {!message.typing && (
-          <span className="message-time">{message.time || ""}</span>
-        )}
+        <span>{message.content}</span>
+        <span className="message-time">{messageTime}</span>
       </div>
-    </div>
-  );
-}
-
-function TypingDots() {
-  return (
-    <div className="typing-dots">
-      <span className="typing-dot dot-1"></span>
-      <span className="typing-dot dot-2"></span>
-      <span className="typing-dot dot-3"></span>
     </div>
   );
 }

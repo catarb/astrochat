@@ -11,7 +11,7 @@ import {
 function Sidebar() {
   const {
     conversations,
-    messages,
+    demoMessages,
     favorites,
     unreadCounts,
     loadingConversations,
@@ -53,7 +53,7 @@ function Sidebar() {
     });
 
   function getLastMessageText(objectId) {
-    const chatMessages = messages[objectId] || [];
+    const chatMessages = demoMessages[objectId] || [];
 
     if (chatMessages.length === 0) {
       return "Sin mensajes todavía";
@@ -69,7 +69,7 @@ function Sidebar() {
   }
 
   function getLastMessageTime(objectId, lastMessageAt) {
-    const chatMessages = messages[objectId] || [];
+    const chatMessages = demoMessages[objectId] || [];
 
     if (chatMessages.length === 0) {
       const fallbackTimes = {

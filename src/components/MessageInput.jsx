@@ -1,15 +1,20 @@
 import { useState } from "react";
 
-function MessageInput({ onSend }) {
+function MessageInput({ onSend, disabled = false }) {
   const [input, setInput] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (input.trim() === "") return;
 
-    onSend(input);
-    setInput("");
+    try {
+      const sentMessage = await onSend(input);
+
+      if (sentMessage) setInput("");
+    } catch {
+      // El input se conserva para que el usuario pueda reintentar.
+    }
   }
 
   return (
@@ -24,9 +29,15 @@ function MessageInput({ onSend }) {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         className="message-input"
+        disabled={disabled}
       />
 
-      <button type="submit" className="send-button" aria-label="Enviar mensaje">
+      <button
+        type="submit"
+        className="send-button"
+        aria-label="Enviar mensaje"
+        disabled={disabled}
+      >
         ➤
       </button>
     </form>
