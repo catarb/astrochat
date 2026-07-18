@@ -48,7 +48,7 @@ function Register() {
     setIsSubmitting(true);
 
     try {
-      const result = await register({
+      await register({
         name: name.trim(),
         email: email.trim(),
         password,
@@ -57,8 +57,7 @@ function Register() {
         replace: true,
         state: {
           success:
-            result.message ||
-            "Usuario registrado. Revisá tu correo para verificar la cuenta.",
+            "Usuario registrado correctamente. Revisá tu correo y abrí el enlace de verificación para activar tu cuenta.",
         },
       });
     } catch (requestError) {

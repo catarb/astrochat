@@ -106,6 +106,10 @@ html {
   display: block;
 }
 
+.mobile-admin-link {
+  display: none;
+}
+
 .logout-mobile-button {
   border: 1px solid #334155;
   background-color: #202c33;
@@ -337,8 +341,13 @@ html {
   line-height: 1;
 }
 
-.header-icon-button:hover {
+.header-icon-button:hover:not(:disabled) {
   background-color: #2a3942;
+}
+
+.header-icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .favorite-active {
@@ -862,6 +871,79 @@ html {
   border-bottom-right-radius: 10px;
 }
 
+.chat-rename-form {
+  width: min(280px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.chat-rename-form label {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chat-rename-form input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  outline: none;
+  background: #202c33;
+  color: #f8fafc;
+  font: inherit;
+  font-size: 14px;
+}
+
+.chat-rename-form input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+}
+
+.chat-rename-form input[aria-invalid="true"] {
+  border-color: #ef4444;
+}
+
+.chat-rename-error {
+  color: #fca5a5;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.chat-rename-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.chat-rename-actions button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #202c33;
+  color: #e2e8f0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chat-rename-actions button[type="submit"] {
+  border-color: #3b82f6;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.chat-rename-actions button:disabled,
+.chat-rename-form input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 /* TOOLTIPS */
 
 .leftbar-tooltip-wrapper {
@@ -1140,6 +1222,53 @@ html {
   color: #cbd5e1;
 }
 
+.verify-email-card {
+  text-align: center;
+}
+
+.verification-spinner {
+  width: 34px;
+  height: 34px;
+  margin: 2px auto;
+  border: 3px solid rgba(203, 213, 225, 0.28);
+  border-top-color: #25d366;
+  border-radius: 50%;
+  animation: verificationSpin 0.8s linear infinite;
+}
+
+.verification-loading {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.verify-email-login-link {
+  display: block;
+  padding: 12px;
+  border-radius: 12px;
+  background: #25d366;
+  color: #08111a;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.verify-email-login-link:hover {
+  background-color: #1ebe5d;
+  transform: translateY(-1px);
+}
+
+.verify-email-login-link:active {
+  transform: scale(0.98);
+}
+
+@keyframes verificationSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* RESPONSIVE */
 
 @media (max-width: 768px) {
@@ -1222,6 +1351,28 @@ html {
 
   .desktop-title {
     display: none;
+  }
+
+  .mobile-admin-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    background: #202c33;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .mobile-admin-link.active {
+    border-color: #3b82f6;
+    background: #2a3942;
   }
 
   .logout-mobile-button {

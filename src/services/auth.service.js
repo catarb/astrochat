@@ -18,6 +18,23 @@ export const register = async (payload) => {
   };
 };
 
+export const verifyEmail = async (token) => {
+  const response = await apiRequest(
+    `/auth/verify-email/${encodeURIComponent(token)}`,
+    {
+      authenticated: false,
+    },
+  );
+
+  if (!response?.success) {
+    throw new ApiError("La respuesta de verificación no es válida.", 500);
+  }
+
+  return {
+    message: response.message,
+  };
+};
+
 export const login = async (payload) => {
   const response = await apiRequest("/auth/login", {
     method: "POST",
