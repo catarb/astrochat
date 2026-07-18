@@ -1,19 +1,13 @@
-import { useState } from "react";
-
-function MessageInput({ onSend, disabled = false }) {
-  const [input, setInput] = useState("");
-
+function MessageInput({ value, onChange, onSend, disabled = false }) {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (input.trim() === "") return;
+    if (value.trim() === "") return;
 
     try {
-      const sentMessage = await onSend(input);
-
-      if (sentMessage) setInput("");
+      await onSend(value);
     } catch {
-      // El input se conserva para que el usuario pueda reintentar.
+      // El flujo superior restaura el borrador y muestra el error.
     }
   }
 
@@ -26,8 +20,8 @@ function MessageInput({ onSend, disabled = false }) {
       <input
         type="text"
         placeholder="Escribí un mensaje"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="message-input"
         disabled={disabled}
       />

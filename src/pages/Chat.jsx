@@ -3,7 +3,7 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
-import { useContext, useMemo, useState, useEffect } from "react";
+import { useContext, useMemo, useRef, useState, useEffect } from "react";
 import { AstroChatContext } from "../context/astro-chat-context";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
@@ -33,6 +33,8 @@ function Chat() {
   const [showSearch, setShowSearch] = useState(!!initialSearch);
   const [searchText, setSearchText] = useState(initialSearch);
   const [showMenu, setShowMenu] = useState(false);
+  const [messageDrafts, setMessageDrafts] = useState({});
+  const chatSubmissionInProgress = useRef(false);
 
   const {
     conversations,
@@ -43,11 +45,12 @@ function Chat() {
     messages,
     favorites,
     toggleFavorite,
-    sendMessage,
+    sendChatMessage,
     refreshMessages,
     loadingMessages,
     messagesError,
-    sendingMessage,
+    sendingChatMessage,
+    sendingChatConversationId,
     loadingConversations,
     conversationsError,
   } = useContext(AstroChatContext);
@@ -71,6 +74,9 @@ function Chat() {
     [messages],
   );
   const isFavorite = favorites.includes(chatDataId);
+  const isCurrentChatSending =
+    sendingChatMessage && sendingChatConversationId === id;
+  const currentMessageDraft = messageDrafts[id] || "";
 
   const filteredMessages = useMemo(() => {
     if (!searchText.trim()) return currentMessages;
@@ -141,12 +147,49 @@ function Chat() {
   }
 
   async function handleSend(text) {
-    return sendMessage(text);
+    const originalContent = text;
+
+    if (
+      !originalContent.trim() ||
+      activeConversationId !== id ||
+      chatSubmissionInProgress.current
+    ) {
+      return null;
+    }
+
+    const conversationId = id;
+    chatSubmissionInProgress.current = true;
+    setMessageDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [conversationId]: "",
+    }));
+
+    try {
+      const result = await sendChatMessage(originalContent);
+
+      if (!result) {
+        setMessageDrafts((currentDrafts) => ({
+          ...currentDrafts,
+          [conversationId]:
+            currentDrafts[conversationId] || originalContent,
+        }));
+      }
+
+      return result;
+    } catch (error) {
+      setMessageDrafts((currentDrafts) => ({
+        ...currentDrafts,
+        [conversationId]: currentDrafts[conversationId] || originalContent,
+      }));
+      throw error;
+    } finally {
+      chatSubmissionInProgress.current = false;
+    }
   }
 
   async function handleQuickQuestion(question) {
     try {
-      await sendMessage(question);
+      await handleSend(question);
     } catch {
       // El contexto ya expone un mensaje de error apto para la interfaz.
     }
@@ -180,7 +223,11 @@ function Chat() {
 
           <div className="chat-header-info">
             <h2>{currentObject.name}</h2>
-            <p>en línea</p>
+            <p>
+              {isCurrentChatSending
+                ? `${currentObject.name || "El asistente"} está escribiendo...`
+                : "en línea"}
+            </p>
           </div>
         </div>
 
@@ -345,7 +392,7 @@ function Chat() {
         {!showSearch && (
           <QuickQuestions
             onAsk={handleQuickQuestion}
-            disabled={sendingMessage}
+            disabled={sendingChatMessage}
           />
         )}
 
@@ -370,7 +417,17 @@ function Chat() {
       </div>
 
       <div className="message-input-wrapper">
-        <MessageInput onSend={handleSend} disabled={sendingMessage} />
+        <MessageInput
+          value={currentMessageDraft}
+          onChange={(value) =>
+            setMessageDrafts((currentDrafts) => ({
+              ...currentDrafts,
+              [id]: value,
+            }))
+          }
+          onSend={handleSend}
+          disabled={sendingChatMessage}
+        />
       </div>
     </div>
   );

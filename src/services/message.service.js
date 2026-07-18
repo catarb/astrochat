@@ -2,7 +2,7 @@ import { ApiError, apiRequest } from "./api";
 
 const PAGE_LIMIT = 100;
 
-const normalizeMessage = (message) => {
+export const normalizeMessage = (message) => {
   const id = message?._id || message?.id;
 
   if (
@@ -31,6 +31,32 @@ const sortChronologically = (messages) =>
     return timeDifference;
   });
 
+export const mergeMessages = (...messageCollections) => {
+  const messagesById = new Map();
+
+  messageCollections.flat().forEach((message) => {
+    const normalizedMessage = normalizeMessage(message);
+    messagesById.set(normalizedMessage.id, normalizedMessage);
+  });
+
+  return sortChronologically([...messagesById.values()]);
+};
+
+export const removeMessageById = (messages, messageId) =>
+  mergeMessages(
+    messages.filter((message) => (message.id || message._id) !== messageId),
+  );
+
+export const replaceMessageById = (
+  messages,
+  messageId,
+  ...replacementMessages
+) =>
+  mergeMessages(
+    messages.filter((message) => (message.id || message._id) !== messageId),
+    replacementMessages,
+  );
+
 export const getMessagesByConversation = async (conversationId) => {
   const messages = [];
   let page = 1;
@@ -56,7 +82,7 @@ export const getMessagesByConversation = async (conversationId) => {
     page += 1;
   } while (page <= totalPages);
 
-  return sortChronologically(messages);
+  return mergeMessages(messages);
 };
 
 export const createMessage = async (conversationId, payload) => {
