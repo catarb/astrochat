@@ -60,6 +60,14 @@ Vite informará en la terminal la URL local del frontend.
 
 Las variables con prefijo `VITE_` quedan disponibles en el bundle del navegador y no deben contener secretos. Las claves de Gemini, credenciales de correo, URI privada de MongoDB y secreto JWT pertenecen exclusivamente al backend.
 
+En el despliegue público, `VITE_API_URL` se configura con:
+
+```text
+https://astrochat-backend-2opw.onrender.com/api
+```
+
+De esta forma, el frontend desplegado consume la API pública de Render sin incluir credenciales sensibles en el bundle.
+
 ## Scripts
 
 | Comando | Descripción |
@@ -282,19 +290,13 @@ El repositorio no contiene capturas de pantalla preparadas para documentación, 
 - El token se guarda actualmente en `localStorage`; este mecanismo persiste la sesión, pero no es invulnerable frente a código malicioso ejecutado en el mismo origen.
 - El archivo `.env` no debe publicarse ni contener secretos de backend.
 
-## Usuario de prueba
-
-Email: **PENDIENTE**
-
-Password: **PENDIENTE**
-
-La cuenta deberá estar verificada antes de iniciar sesión.
-
 ## Deploy
 
-Frontend desplegado: **PENDIENTE**
+Frontend desplegado en Vercel: `https://astrochat-mu.vercel.app`
 
-Backend desplegado: **PENDIENTE**
+Backend consumido por el frontend: `https://astrochat-backend-2opw.onrender.com`
+
+El deployment de Vercel utiliza `npm run build`, publica el directorio `dist/` y configura `VITE_API_URL=https://astrochat-backend-2opw.onrender.com/api`. El archivo `vercel.json` incluye el rewrite necesario para que las rutas de la SPA, como `/login`, `/verify-email` y `/chat/:id`, funcionen al abrirse directamente.
 
 ## Relación con el backend
 
@@ -309,12 +311,6 @@ La colección de Postman corresponde al repositorio backend y no se genera desde
 
 ## Estado del proyecto
 
-Las funcionalidades principales están implementadas: registro, login, persistencia y validación de sesión, catálogo de Astros, CRUD administrativo de Astros, gestión de Conversations, historial persistente de Messages y Chat integrado con Gemini.
+La versión final está implementada y desplegada públicamente. Incluye registro, verificación de correo, login, persistencia y validación de sesión, catálogo de Astros, CRUD administrativo de Astros, gestión de Conversations, historial persistente de Messages y Chat integrado con Gemini.
 
-Pendientes para la entrega:
-
-- Deploy de frontend y backend.
-- Credenciales verificadas de prueba.
-- Pantalla frontend que consuma el token de verificación de correo.
-- Revisión visual manual final en todos los viewports objetivo.
-- Colección de Postman en el repositorio backend.
+El frontend está publicado en Vercel y consume el backend desplegado en Render mediante `VITE_API_URL`. La pantalla pública `/verify-email` completa el flujo de verificación enviado por correo, y el repositorio backend incluye la colección de Postman para probar los 21 endpoints de la API.
